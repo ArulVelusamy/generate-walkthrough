@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Python (in case walkthroughs are generated against Python repos here)
+__pycache__/
+*.py[cod]
+instance/
+*.sqlite
+
+# Node
+node_modules/
+
+# Env / secrets
+.env
+.env.*
+
+# Logs / temp
+*.log
+*.tmp

@@ -1,0 +1,377 @@
+<title>Flaskr — End-to-End Walkthrough</title>
+<style>
+  :root{
+    --bg:#FBFBFD; --surface:#FFFFFF; --surface-2:#F4F6F9; --ink:#14181F; --ink-2:#586172;
+    --line:#E4E8ED; --line-2:#EDF0F4; --accent:#0F6E4F; --accent-2:#128A62; --accent-soft:rgba(15,110,79,.08);
+    --good:#0F7A4A; --good-bg:rgba(15,122,74,.10); --warn:#9A5B08; --warn-bg:rgba(180,110,20,.13);
+    --crit:#B4271C; --crit-bg:rgba(180,39,28,.09); --info:#1668B0; --info-bg:rgba(22,104,176,.10);
+    --code:#0B2A20; --code-bg:#F1F5F3; --code-line:#DDE7E2;
+    --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.05);
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,"Menlo","Cascadia Code","Roboto Mono",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,"Helvetica Neue",Arial,sans-serif;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0D110F; --surface:#141A17; --surface-2:#1A211D; --ink:#E8ECEA; --ink-2:#93A29B;
+      --line:#26302B; --line-2:#20282400; --accent:#4FBF93; --accent-2:#6FCFA8; --accent-soft:rgba(79,191,147,.11);
+      --good:#4FC088; --good-bg:rgba(79,192,136,.12); --warn:#E2AC5B; --warn-bg:rgba(226,172,91,.13);
+      --crit:#F08A80; --crit-bg:rgba(240,138,128,.11); --info:#74B7EF; --info-bg:rgba(116,183,239,.12);
+      --code:#CFE8DE; --code-bg:#111A16; --code-line:#25302B;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.25);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0D110F; --surface:#141A17; --surface-2:#1A211D; --ink:#E8ECEA; --ink-2:#93A29B;
+    --line:#26302B; --line-2:#202824; --accent:#4FBF93; --accent-2:#6FCFA8; --accent-soft:rgba(79,191,147,.11);
+    --good:#4FC088; --good-bg:rgba(79,192,136,.12); --warn:#E2AC5B; --warn-bg:rgba(226,172,91,.13);
+    --crit:#F08A80; --crit-bg:rgba(240,138,128,.11); --info:#74B7EF; --info-bg:rgba(116,183,239,.12);
+    --code:#CFE8DE; --code-bg:#111A16; --code-line:#25302B;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.25);
+  }
+  :root[data-theme="light"]{
+    --bg:#FBFBFD; --surface:#FFFFFF; --surface-2:#F4F6F9; --ink:#14181F; --ink-2:#586172;
+    --line:#E4E8ED; --line-2:#EDF0F4; --accent:#0F6E4F; --accent-2:#128A62; --accent-soft:rgba(15,110,79,.08);
+    --good:#0F7A4A; --good-bg:rgba(15,122,74,.10); --warn:#9A5B08; --warn-bg:rgba(180,110,20,.13);
+    --crit:#B4271C; --crit-bg:rgba(180,39,28,.09); --info:#1668B0; --info-bg:rgba(22,104,176,.10);
+    --code:#0B2A20; --code-bg:#F1F5F3; --code-line:#DDE7E2;
+    --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.05);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    font-size:15px;line-height:1.62;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  .layout{display:grid;grid-template-columns:288px minmax(0,1fr);gap:0;max-width:1400px;margin:0 auto}
+
+  aside{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;
+    border-right:1px solid var(--line);padding:28px 22px 60px;background:var(--surface)}
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .brand .mark{width:30px;height:30px;border-radius:7px;background:var(--accent);color:#fff;
+    display:grid;place-items:center;font-weight:700;font-size:14px;flex:none;letter-spacing:-.02em}
+  .brand b{font-size:14px;letter-spacing:-.01em}
+  .brand span{display:block;font-size:11.5px;color:var(--ink-2);font-weight:500}
+  .themetog{margin-top:16px;display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);
+    border-radius:8px;background:var(--surface-2)}
+  .themetog button{font:inherit;font-size:11px;color:var(--ink-2);background:none;border:0;cursor:pointer;
+    padding:3px 8px;border-radius:6px}
+  .themetog button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+  nav{margin-top:22px}
+  nav a{display:block;color:var(--ink-2);text-decoration:none;font-size:13px;padding:5px 10px;border-radius:6px;
+    border-left:2px solid transparent;line-height:1.4}
+  nav a:hover{color:var(--ink);background:var(--surface-2)}
+  nav a.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-soft);font-weight:600}
+  nav a .n{font-family:var(--mono);font-size:11px;color:var(--ink-2);margin-right:8px}
+  nav a.active .n{color:var(--accent)}
+  nav .grp{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-2);
+    font-weight:700;margin:20px 0 6px 10px;opacity:.8}
+
+  main{padding:0 clamp(20px,4vw,64px) 120px;min-width:0}
+  .wrap{max-width:820px;margin:0 auto}
+  header.hero{padding:64px 0 30px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.02em;color:var(--accent);
+    text-transform:uppercase;font-weight:600;margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,46px);line-height:1.08;
+    letter-spacing:-.015em;margin:0 0 18px;text-wrap:balance}
+  .lede{font-size:18px;line-height:1.6;color:var(--ink-2);max-width:64ch;margin:0}
+  .lede b{color:var(--ink);font-weight:600}
+
+  section{padding-top:56px;scroll-margin-top:20px}
+  h2{font-family:var(--serif);font-weight:600;font-size:27px;letter-spacing:-.01em;margin:0 0 4px;
+    display:flex;align-items:baseline;gap:14px;text-wrap:balance}
+  h2 .stage{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);
+    background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);
+    padding:3px 9px;border-radius:7px;flex:none;transform:translateY(-3px)}
+  h3{font-size:17px;font-weight:650;letter-spacing:-.005em;margin:34px 0 2px;scroll-margin-top:20px}
+  h4{font-size:14px;font-weight:650;margin:22px 0 8px;color:var(--ink)}
+  .sub{color:var(--ink-2);font-size:14.5px;margin:2px 0 14px}
+  p{margin:12px 0}
+  a.inl{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+  a.inl:hover{border-bottom-color:var(--accent)}
+  code{font-family:var(--mono);font-size:.855em;background:var(--code-bg);color:var(--code);
+    padding:1.5px 5px;border-radius:5px;border:1px solid var(--code-line);word-break:break-word}
+  .file{font-family:var(--mono);font-size:12px;color:var(--ink-2);background:var(--surface-2);
+    border:1px solid var(--line);border-radius:6px;padding:2px 8px;display:inline-block}
+  pre{background:var(--code-bg);border:1px solid var(--code-line);border-radius:9px;padding:14px 16px;
+    overflow-x:auto;margin:14px 0;font-size:12.5px;line-height:1.55}
+  pre code{background:none;border:0;padding:0;color:var(--code)}
+
+  .call{border:1px solid var(--line);border-radius:10px;background:var(--surface);margin:16px 0;
+    box-shadow:var(--shadow);overflow:hidden}
+  .call-top{display:flex;align-items:center;gap:9px;padding:9px 14px;border-bottom:1px solid var(--line-2);
+    background:var(--surface-2)}
+  .call-tag{font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+    color:var(--accent)}
+  .call-body{padding:12px 15px;font-size:14px}
+  .call-body p:first-child{margin-top:0}.call-body p:last-child{margin-bottom:0}
+
+  .flow{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:16px 0;background:var(--surface)}
+  .flow .row{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:11px 14px;border-bottom:1px solid var(--line-2);
+    font-size:13.5px}
+  .flow .row:last-child{border-bottom:0}
+  .flow .num{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-soft);
+    border-radius:6px;height:22px;display:grid;place-items:center}
+  .flow .lbl{font-family:var(--mono);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+    color:var(--ink-2);margin-right:6px}
+
+  .p{border-left:3px solid var(--line);padding:9px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:13.5px;
+    background:var(--surface-2)}
+  .p .h{font-weight:650;display:block;margin-bottom:2px;font-size:13px}
+  .okp{border-left-color:var(--good);background:var(--good-bg)} .okp .h{color:var(--good)}
+  .infop{border-left-color:var(--info);background:var(--info-bg)} .infop .h{color:var(--info)}
+  .warnp{border-left-color:var(--warn);background:var(--warn-bg)} .warnp .h{color:var(--warn)}
+  .critp{border-left-color:var(--crit);background:var(--crit-bg)} .critp .h{color:var(--crit)}
+
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin:16px 0}
+  table{border-collapse:collapse;width:100%;font-size:13px;min-width:520px}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;
+    color:var(--ink-2);padding:9px 14px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+  td{padding:9px 14px;border-bottom:1px solid var(--line-2);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  td.m,th.m{font-family:var(--mono);font-size:12px}
+  .sev{font-family:var(--mono);font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap}
+  .sev.c{color:var(--crit);background:var(--crit-bg)} .sev.w{color:var(--warn);background:var(--warn-bg)}
+  .sev.i{color:var(--info);background:var(--info-bg)} .sev.o{color:var(--good);background:var(--good-bg)}
+  .foot{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);color:var(--ink-2);font-size:12.5px}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}aside{display:none}}
+</style>
+
+<div class="layout">
+<aside>
+  <div class="brand">
+    <div class="mark">Fk</div>
+    <div><b>Flaskr</b><span>Flask tutorial · walkthrough</span></div>
+  </div>
+  <div class="themetog" role="group" aria-label="Theme">
+    <button data-t="light" aria-pressed="false">Light</button>
+    <button data-t="auto" aria-pressed="true">Auto</button>
+    <button data-t="dark" aria-pressed="false">Dark</button>
+  </div>
+  <nav id="toc">
+    <div class="grp">Foundations</div>
+    <a href="#arch"><span class="n">00</span>Architecture</a>
+    <a href="#sequence"><span class="n">01</span>End-to-end sequence</a>
+    <div class="grp">New visitor → author</div>
+    <a href="#register"><span class="n">02</span>Register</a>
+    <a href="#login"><span class="n">03</span>Log in &amp; the session</a>
+    <a href="#index"><span class="n">04</span>The index &amp; the auth gate</a>
+    <a href="#create"><span class="n">05</span>Create a post</a>
+    <a href="#edit"><span class="n">06</span>Edit &amp; delete</a>
+    <a href="#logout"><span class="n">07</span>Log out</a>
+    <div class="grp">Reference</div>
+    <a href="#state"><span class="n">08</span>Request-scoped state</a>
+    <a href="#schema"><span class="n">09</span>Data model</a>
+    <div class="grp">Config</div>
+    <a href="#params"><span class="n">10</span>Parameter glossary</a>
+    <div class="grp">Boundaries</div>
+    <a href="#boundaries"><span class="n">11</span>Correctness &amp; security</a>
+  </nav>
+</aside>
+
+<main><div class="wrap">
+<header class="hero">
+  <div class="eyebrow">Python · Flask · SQLite · Jinja2</div>
+  <h1>What actually happens, from first visit to a published post.</h1>
+  <p class="lede">Flaskr is the official Flask tutorial blog: an <b>application factory</b>, two blueprints, a per-request SQLite connection, and session-cookie auth. This traces every route from tap to database — <b>grounded in the source, line by line</b>.</p>
+</header>
+
+<section id="arch">
+  <h2><span class="stage">00</span>Architecture</h2>
+  <p class="sub">One factory function assembles the app; everything else is a blueprint or a helper.</p>
+  <p><code>create_app()</code> (<span class="file">flaskr/__init__.py:6</span>) builds the app with <code>instance_relative_config=True</code>, sets two defaults, optionally overlays an instance <code>config.py</code>, wires the database, registers both blueprints, and aliases <code>/</code>.</p>
+  <div class="flow">
+    <div class="row"><div class="num">1</div><div><span class="lbl">config</span><code>from_mapping(SECRET_KEY="dev", DATABASE=&lt;instance&gt;/flaskr.sqlite)</code> — <span class="file">__init__.py:9–14</span>. Then <code>from_pyfile("config.py", silent=True)</code> overlays real secrets in production (:18).</div></div>
+    <div class="row"><div class="num">2</div><div><span class="lbl">db</span><code>db.init_app(app)</code> registers the teardown + the <code>init-db</code> CLI command — <span class="file">__init__.py:33</span>.</div></div>
+    <div class="row"><div class="num">3</div><div><span class="lbl">blueprints</span><code>register_blueprint(auth.bp)</code> (prefix <code>/auth</code>) and <code>register_blueprint(blog.bp)</code> (no prefix, mounts at root) — <span class="file">__init__.py:39–40</span>.</div></div>
+    <div class="row"><div class="num">4</div><div><span class="lbl">index</span><code>add_url_rule("/", endpoint="index")</code> makes <code>url_for('index') == url_for('blog.index')</code> — <span class="file">__init__.py:46</span>. Templates link to the generic <code>index</code>.</div></div>
+  </div>
+  <div class="call"><div class="call-top"><span class="call-tag">Also</span></div>
+    <div class="call-body"><p>A throwaway <code>GET /hello</code> → <code>"Hello, World!"</code> is defined inline on the app (<span class="file">__init__.py:26–28</span>) — a smoke-test route, not part of the journey.</p></div></div>
+</section>
+
+<section id="sequence">
+  <h2><span class="stage">01</span>End-to-end sequence</h2>
+  <p class="sub">The whole app is six routes across two blueprints. Every request first runs <code>load_logged_in_user</code>.</p>
+  <div class="flow">
+    <div class="row"><div class="num">→</div><div><span class="lbl">every request</span><code>@bp.before_app_request load_logged_in_user()</code> reads <code>session["user_id"]</code> and hydrates <code>g.user</code> — <span class="file">auth.py:32–43</span>.</div></div>
+    <div class="row"><div class="num">1</div><div><span class="lbl">POST /auth/register</span>create account → redirect to login</div></div>
+    <div class="row"><div class="num">2</div><div><span class="lbl">POST /auth/login</span>set <code>session["user_id"]</code> → redirect to <code>index</code></div></div>
+    <div class="row"><div class="num">3</div><div><span class="lbl">GET /</span><code>blog.index</code> — list all posts (public)</div></div>
+    <div class="row"><div class="num">4</div><div><span class="lbl">POST /create</span><code>@login_required</code> → insert post owned by <code>g.user</code></div></div>
+    <div class="row"><div class="num">5</div><div><span class="lbl">POST /&lt;id&gt;/update · /delete</span><code>@login_required</code> + <code>get_post</code> ownership gate</div></div>
+    <div class="row"><div class="num">6</div><div><span class="lbl">GET /auth/logout</span><code>session.clear()</code> → redirect to <code>index</code></div></div>
+  </div>
+</section>
+
+<section id="register">
+  <h2><span class="stage">02</span>Register</h2>
+  <p class="sub"><span class="file">flaskr/auth.py:46–81</span> · route <code>/auth/register</code> · methods <code>GET, POST</code></p>
+  <p>A <code>GET</code> renders the form (<code>auth/register.html</code>). A <code>POST</code> reads <code>username</code> and <code>password</code> from <code>request.form</code> (:54–55) and validates:</p>
+  <div class="flow">
+    <div class="row"><div class="num">1</div><div><span class="lbl">validate</span><code>if not username</code> → <code>"Username is required."</code>; <code>elif not password</code> → <code>"Password is required."</code> — <span class="file">auth.py:59–62</span></div></div>
+    <div class="row"><div class="num">2</div><div><span class="lbl">insert</span><code>INSERT INTO user (username, password) VALUES (?, ?)</code> with <code>generate_password_hash(password)</code> — <span class="file">auth.py:67–69</span>. Password is never stored in clear text.</div></div>
+    <div class="row"><div class="num">3</div><div><span class="lbl">unique</span>on <code>db.IntegrityError</code> (the <code>UNIQUE</code> constraint) → <code>"User {username} is already registered."</code> — <span class="file">auth.py:71–74</span></div></div>
+    <div class="row"><div class="num">4</div><div><span class="lbl">success</span><code>redirect(url_for("auth.login"))</code> — <span class="file">auth.py:77</span>. Any error is surfaced with <code>flash(error)</code> and the form re-renders (:79–81).</div></div>
+  </div>
+  <div class="p okp"><span class="h">Correct by construction</span>Username uniqueness is enforced by the database (<code>UNIQUE</code>, <span class="file">schema.sql:9</span>) and caught as a validation error rather than a race-prone pre-check.</div>
+</section>
+
+<section id="login">
+  <h2><span class="stage">03</span>Log in &amp; the session</h2>
+  <p class="sub"><span class="file">flaskr/auth.py:84–109</span> · route <code>/auth/login</code> · methods <code>GET, POST</code></p>
+  <p>A <code>POST</code> looks the user up by name, verifies the hash, and — on success — stores their id in a fresh session cookie.</p>
+  <div class="flow">
+    <div class="row"><div class="num">1</div><div><span class="lbl">lookup</span><code>SELECT * FROM user WHERE username = ?</code> → <code>.fetchone()</code> — <span class="file">auth.py:92–94</span></div></div>
+    <div class="row"><div class="num">2</div><div><span class="lbl">verify</span><code>if user is None</code> → <code>"Incorrect username."</code>; <code>elif not check_password_hash(user["password"], password)</code> → <code>"Incorrect password."</code> — <span class="file">auth.py:96–99</span></div></div>
+    <div class="row"><div class="num">3</div><div><span class="lbl">session</span><code>session.clear()</code> then <code>session["user_id"] = user["id"]</code> — <span class="file">auth.py:103–104</span>. The cleared-then-set pattern prevents session fixation.</div></div>
+    <div class="row"><div class="num">4</div><div><span class="lbl">redirect</span><code>redirect(url_for("index"))</code> — <span class="file">auth.py:105</span></div></div>
+  </div>
+  <div class="call"><div class="call-top"><span class="call-tag">Why a session id, not a token</span></div>
+    <div class="call-body"><p>Flask signs the session cookie with <code>SECRET_KEY</code>. Only <code>user_id</code> lives in it; the full user row is re-loaded from the database on every request by <code>load_logged_in_user</code> (§08). There is no JWT, no server-side session store — the signed cookie <em>is</em> the session.</p></div></div>
+  <div class="p warnp"><span class="h">Username enumeration</span>Separate <code>"Incorrect username."</code> vs <code>"Incorrect password."</code> messages (<span class="file">auth.py:97,99</span>) reveal whether an account exists. See §11.</div>
+</section>
+
+<section id="index">
+  <h2><span class="stage">04</span>The index &amp; the auth gate</h2>
+  <p class="sub"><span class="file">flaskr/blog.py:16–25</span> · route <code>/</code> (aliased <code>index</code>) · public</p>
+  <p>The landing page lists every post, newest first, joining in each author's name:</p>
+  <pre><code>SELECT p.id, title, body, created, author_id, username
+  FROM post p JOIN user u ON p.author_id = u.id
+ ORDER BY created DESC</code></pre>
+  <p>Rendered by <code>blog/index.html</code>: the <em>New</em> link shows only <code>{% if g.user %}</code>, and each post's <em>Edit</em> link shows only <code>{% if g.user['id'] == post['author_id'] %}</code> — the UI mirrors the server-side ownership rule.</p>
+  <h3>The gate — <code>login_required</code></h3>
+  <p><span class="file">auth.py:19–29</span> — a decorator wrapping the write views. If <code>g.user is None</code> it redirects to <code>auth.login</code>; otherwise it calls the view. This is the single choke point protecting <code>create</code>, <code>update</code>, and <code>delete</code>.</p>
+</section>
+
+<section id="create">
+  <h2><span class="stage">05</span>Create a post</h2>
+  <p class="sub"><span class="file">flaskr/blog.py:60–83</span> · route <code>/create</code> · methods <code>GET, POST</code> · <code>@login_required</code></p>
+  <div class="flow">
+    <div class="row"><div class="num">1</div><div><span class="lbl">read</span><code>request.form["title"]</code>, <code>request.form["body"]</code> — <span class="file">blog.py:65–66</span></div></div>
+    <div class="row"><div class="num">2</div><div><span class="lbl">validate</span><code>if not title</code> → flash <code>"Title is required."</code> — <span class="file">blog.py:69–73</span>. Body is <em>not</em> validated.</div></div>
+    <div class="row"><div class="num">3</div><div><span class="lbl">insert</span><code>INSERT INTO post (title, body, author_id) VALUES (?, ?, ?)</code> with <code>g.user["id"]</code> — <span class="file">blog.py:77–78</span>. Authorship is taken from the session, never the form.</div></div>
+    <div class="row"><div class="num">4</div><div><span class="lbl">redirect</span><code>redirect(url_for("blog.index"))</code> — <span class="file">blog.py:81</span></div></div>
+  </div>
+  <div class="p okp"><span class="h">No cross-user writes</span>Because <code>author_id</code> comes from <code>g.user["id"]</code> and not a form field, a caller can only ever create posts they own.</div>
+</section>
+
+<section id="edit">
+  <h2><span class="stage">06</span>Edit &amp; delete</h2>
+  <p class="sub"><span class="file">flaskr/blog.py:86–125</span> · <code>/&lt;int:id&gt;/update</code> (GET, POST) &amp; <code>/&lt;int:id&gt;/delete</code> (POST) · both <code>@login_required</code></p>
+  <p>Both routes funnel authorization through one helper, <code>get_post</code> (<span class="file">blog.py:28–57</span>):</p>
+  <div class="flow">
+    <div class="row"><div class="num">1</div><div><span class="lbl">fetch</span><code>SELECT … FROM post p JOIN user u … WHERE p.id = ?</code> → <code>.fetchone()</code> — <span class="file">blog.py:43–49</span></div></div>
+    <div class="row"><div class="num">2</div><div><span class="lbl">exists</span><code>if post is None: abort(404, "Post id {id} doesn't exist.")</code> — <span class="file">blog.py:51–52</span></div></div>
+    <div class="row"><div class="num">3</div><div><span class="lbl">own</span><code>if check_author and post["author_id"] != g.user["id"]: abort(403)</code> — <span class="file">blog.py:54–55</span></div></div>
+  </div>
+  <p><b>Update</b> calls <code>get_post(id)</code> first (:90), then on <code>POST</code> runs <code>UPDATE post SET title=?, body=? WHERE id=?</code> (:105). <b>Delete</b> is <code>POST</code>-only, calls <code>get_post(id)</code> for its 404/403 side effects (:121), then <code>DELETE FROM post WHERE id=?</code> (:123). The <code>update.html</code> delete button carries a JS <code>confirm('Are you sure?')</code> (:17).</p>
+  <div class="p infop"><span class="h">One rule, one place</span>Ownership lives solely in <code>get_post</code>'s <code>abort(403)</code>. Both mutating routes share it, so the authorization surface is a single line — easy to audit, hard to bypass.</div>
+</section>
+
+<section id="logout">
+  <h2><span class="stage">07</span>Log out</h2>
+  <p class="sub"><span class="file">flaskr/auth.py:112–116</span> · route <code>/auth/logout</code></p>
+  <p><code>session.clear()</code> drops <code>user_id</code>, then <code>redirect(url_for("index"))</code>. On the next request <code>load_logged_in_user</code> sees no <code>user_id</code> and sets <code>g.user = None</code> — the nav reverts to Register / Log In.</p>
+  <div class="p warnp"><span class="h">Logout is a GET</span><code>/auth/logout</code> takes no <code>methods</code> arg, so it is <code>GET</code>-only and has no CSRF token — a third-party page can force a logout. Low impact, but see §11.</div>
+</section>
+
+<section id="state">
+  <h2><span class="stage">08</span>Request-scoped state</h2>
+  <p class="sub">Two objects carry state: the signed <code>session</code> cookie (across requests) and <code>g</code> (within one request).</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Key</th><th>Lives on</th><th>Set where</th><th>Read where</th></tr></thead>
+    <tbody>
+      <tr><td class="m">session["user_id"]</td><td>Signed cookie</td><td class="m">auth.py:104 (login)</td><td class="m">auth.py:36 (every request)</td></tr>
+      <tr><td class="m">g.user</td><td>Request (<code>g</code>)</td><td class="m">auth.py:39/41 (before_app_request)</td><td>views, templates, <code>get_post</code></td></tr>
+      <tr><td class="m">g.db</td><td>Request (<code>g</code>)</td><td class="m">db.py:15 (first get_db)</td><td class="m">db.py:20; closed db.py:27</td></tr>
+    </tbody>
+  </table></div>
+  <p>The connection is created lazily on first <code>get_db()</code>, cached on <code>g</code>, and closed by the <code>teardown_appcontext(close_db)</code> hook (<span class="file">db.py:55</span>) — one connection per request, always released.</p>
+</section>
+
+<section id="schema">
+  <h2><span class="stage">09</span>Data model</h2>
+  <p class="sub"><span class="file">flaskr/schema.sql</span> — two tables, initialised by <code>flask init-db</code>.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Table · column</th><th>Type</th><th>Constraints</th></tr></thead>
+    <tbody>
+      <tr><td class="m">user.id</td><td class="m">INTEGER</td><td>PRIMARY KEY AUTOINCREMENT</td></tr>
+      <tr><td class="m">user.username</td><td class="m">TEXT</td><td>UNIQUE NOT NULL</td></tr>
+      <tr><td class="m">user.password</td><td class="m">TEXT</td><td>NOT NULL (werkzeug hash)</td></tr>
+      <tr><td class="m">post.id</td><td class="m">INTEGER</td><td>PRIMARY KEY AUTOINCREMENT</td></tr>
+      <tr><td class="m">post.author_id</td><td class="m">INTEGER</td><td>NOT NULL · FK → user(id)</td></tr>
+      <tr><td class="m">post.created</td><td class="m">TIMESTAMP</td><td>NOT NULL DEFAULT CURRENT_TIMESTAMP</td></tr>
+      <tr><td class="m">post.title</td><td class="m">TEXT</td><td>NOT NULL</td></tr>
+      <tr><td class="m">post.body</td><td class="m">TEXT</td><td>NOT NULL</td></tr>
+    </tbody>
+  </table></div>
+  <p><code>init_db()</code> (<span class="file">db.py:33–38</span>) runs this script via <code>executescript</code>, which begins by <code>DROP TABLE IF EXISTS</code> both tables (<span class="file">schema.sql:4–5</span>) — <code>init-db</code> is destructive by design. Timestamps come back as <code>datetime</code> via a registered converter (<span class="file">db.py:48</span>).</p>
+</section>
+
+<section id="params">
+  <h2><span class="stage">10</span>Parameter glossary</h2>
+  <p class="sub">Every configurable value, where it is set, and who reads it.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Parameter</th><th>Default</th><th>Set where</th><th>Read where</th></tr></thead>
+    <tbody>
+      <tr><td class="m">SECRET_KEY</td><td class="m">"dev"</td><td>factory default; overridden by instance <code>config.py</code></td><td>Flask session-cookie signing</td></tr>
+      <tr><td class="m">DATABASE</td><td class="m">&lt;instance&gt;/flaskr.sqlite</td><td class="m">__init__.py:13</td><td class="m">db.py:16 (get_db)</td></tr>
+      <tr><td class="m">config.py</td><td>—</td><td>instance folder (git-ignored)</td><td class="m">__init__.py:18 (silent)</td></tr>
+      <tr><td class="m">TESTING (test_config)</td><td>—</td><td>passed to <code>create_app</code> by tests</td><td class="m">__init__.py:16–21</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="boundaries">
+  <h2><span class="stage">11</span>Correctness &amp; security</h2>
+  <p class="sub">Issues visible in the source. Most are deliberate tutorial simplifications — flagged accurately, not alarmingly.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Issue</th><th>Sev</th><th>Where</th><th>Consequence</th></tr></thead>
+    <tbody>
+      <tr><td>Default <code>SECRET_KEY="dev"</code> used if instance <code>config.py</code> absent (loaded <code>silent=True</code>)</td><td><span class="sev c">high</span></td><td class="m">__init__.py:11,18</td><td>Predictable key → session-cookie forgery in production.</td></tr>
+      <tr><td>No CSRF tokens on any form; no Flask-WTF wired</td><td><span class="sev w">med</span></td><td class="m">register/login/create/update.html</td><td>State-changing POSTs (and GET logout) are cross-site forgeable.</td></tr>
+      <tr><td>Username enumeration via distinct error strings</td><td><span class="sev w">med</span></td><td class="m">auth.py:97,99,74</td><td>Login/register reveal whether an account exists.</td></tr>
+      <tr><td>FK <code>author_id</code> has no <code>ON DELETE</code>; SQLite <code>foreign_keys</code> pragma not enabled</td><td><span class="sev i">low</span></td><td class="m">schema.sql:19</td><td>Deleting a user can orphan posts; the index JOIN then silently drops them.</td></tr>
+      <tr><td>Index loads all posts — no <code>LIMIT</code>/pagination</td><td><span class="sev i">low</span></td><td class="m">blog.py:20–24</td><td>Unbounded query as the table grows.</td></tr>
+      <tr><td><code>body</code> unvalidated yet column is <code>NOT NULL</code></td><td><span class="sev i">low</span></td><td class="m">blog.py:66; schema.sql:18</td><td>Empty string accepted (empty ≠ NULL) — allows blank-body posts.</td></tr>
+      <tr><td>Session cookie flags (<code>SECURE</code>, <code>SAMESITE</code>) not configured</td><td><span class="sev i">low</span></td><td class="m">__init__.py:9–14</td><td>Relies on Flask defaults (HttpOnly on, Secure off).</td></tr>
+    </tbody>
+  </table></div>
+  <div class="p okp"><span class="h">Verified clean — not issues</span>All SQL uses <code>?</code> placeholders (no injection); passwords are hashed with werkzeug; login clears the session before setting it (no fixation); ownership is enforced on both mutating routes. Debug mode is <em>not</em> enabled in <code>create_app</code>.</div>
+</section>
+
+<div class="foot">
+  Generated by the <code>generate-walkthrough</code> skill · source: <code>pallets/flask</code> <code>examples/tutorial</code> (BSD-3-Clause). Every claim anchored to <code>file:line</code> and verified against source.
+</div>
+</div></main>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement, KEY="flaskr-theme";
+  var saved=null; try{saved=localStorage.getItem(KEY)}catch(e){}
+  function apply(t){
+    if(t==="auto"){root.removeAttribute("data-theme")}else{root.setAttribute("data-theme",t)}
+    document.querySelectorAll(".themetog button").forEach(function(b){
+      b.setAttribute("aria-pressed", String(b.getAttribute("data-t")===t));
+    });
+  }
+  apply(saved||"auto");
+  document.querySelectorAll(".themetog button").forEach(function(b){
+    b.addEventListener("click",function(){
+      var t=b.getAttribute("data-t"); try{localStorage.setItem(KEY,t)}catch(e){} apply(t);
+    });
+  });
+  var links=[].slice.call(document.querySelectorAll("#toc a"));
+  var byId={}; links.forEach(function(a){byId[a.getAttribute("href").slice(1)]=a});
+  var obs=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(a){a.classList.remove("active")});
+        var a=byId[e.target.id]; if(a)a.classList.add("active");
+      }
+    });
+  },{rootMargin:"-10% 0px -80% 0px",threshold:0});
+  document.querySelectorAll("main section[id]").forEach(function(s){obs.observe(s)});
+})();
+</script>

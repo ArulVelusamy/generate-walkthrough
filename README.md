@@ -1,0 +1,67 @@
+# generate-walkthrough
+
+A Claude Code skill that turns **any codebase** into a single, self-contained HTML **walkthrough** — a forensic, screen-by-screen trace of what the system actually does, from first entry point to terminal outcome, grounded in real `file:line` evidence.
+
+The output is one `.html` file that opens in any browser with **zero external assets** — no build, no dependencies, no network. Light + dark themes, a sticky navigable table of contents, a data-model reference, a parameter glossary, and a security/correctness "boundaries" section.
+
+> **Status: experimental.** Validated end-to-end on two very different stacks (see [Validation](#validation)). Treat it as promising, not battle-hardened.
+
+---
+
+## What makes it different
+
+Most "explain this repo" tools summarize. This one **verifies**. Its core rule:
+
+> Every factual claim is independently re-derived from source, or it is deleted. Accuracy over coverage; nothing unverified ships.
+
+It runs in three phases:
+
+1. **Investigate & verify (parallel).** A lead agent fans out read-only investigator subagents — one per journey segment, plus data model, parameter glossary, and a boundaries sweep. Each returns `file:line`-anchored findings, never prose. The lead merges them into a verified coverage inventory.
+2. **Write (solo).** The lead writes one HTML file so tokens, TOC, and CSS stay coherent, keeping a claim ledger (every fact tagged with its source line).
+3. **Review (parallel, looped).** Verifier subagents re-derive each claim from source without trusting the draft; a reverse coverage diff catches anything real that was omitted; the loop repeats until zero WRONG, zero UNVERIFIABLE, and an empty gap.
+
+## Install
+
+Copy the skill into your Claude Code skills directory:
+
+```bash
+mkdir -p ~/.claude/skills/generate-walkthrough
+cp SKILL.md walkthrough-spec.md ~/.claude/skills/generate-walkthrough/
+```
+
+Then, in any repo:
+
+```
+/generate-walkthrough
+```
+
+Optionally scope it: `/generate-walkthrough focus on the checkout flow`.
+
+It will extract packaged source if needed, fan out investigators, write `<ProjectName>-Walkthrough.html`, and run the verify loop.
+
+## Files
+
+| File | Purpose |
+|------|---------|
+| `SKILL.md` | The skill: three-phase workflow + orchestration model + verify loop |
+| `walkthrough-spec.md` | The exact HTML output spec — layout, design tokens, components, document arc (loaded during the write phase) |
+| `examples/Flaskr-Walkthrough.html` | A real sample output (see below) |
+
+## Validation
+
+The skill has been run end-to-end and its output verified against source on:
+
+- **A Python / Flask / SQLite / Jinja2 app** — the public [Flask tutorial (`flaskr`)](https://github.com/pallets/flask/tree/main/examples/tutorial). Sample output: [`examples/Flaskr-Walkthrough.html`](examples/Flaskr-Walkthrough.html). Every claim (routes, SQL, flash strings, schema, ownership rules) was confirmed line-by-line; the boundaries section correctly flagged real issues (weak default `SECRET_KEY`, missing CSRF, username enumeration, FK/pragma orphan risk) **without** false positives (it explicitly cleared SQL injection and declined to invent a debug-mode issue).
+- **A private Vue / Express web application** — on the login/auth slice, the pipeline reproduced 100% of a hand-written reference doc's claims from source alone, *and* surfaced a critical auth bug the reference had missed.
+
+Two stacks is enough to show it generalizes, not enough to call it proven. Contributions validating more stacks are welcome.
+
+## Limitations
+
+- Built for **Claude Code** — it relies on Claude Code's subagent (`Agent`) model for the parallel investigate/verify phases. Porting to other agent runtimes would require reworking the orchestration.
+- Best on codebases small-to-medium enough that the primary journey can be fully traced. Very large monorepos may need a scoped invocation.
+- The verify loop drives toward "every surviving claim is source-confirmed." Where code genuinely can't be traced (generated/vendored), it emits an explicit "could not verify" note rather than guessing — read those notes.
+
+## License
+
+MIT — see [LICENSE](LICENSE). Remember to set your name in the copyright line.
