@@ -4,9 +4,14 @@ A Claude Code skill that turns **any codebase** into a single, self-contained HT
 
 The output is one `.html` file that opens in any browser with **zero external assets** — no build, no dependencies, no network. Light + dark themes, a sticky navigable table of contents, a data-model reference, a parameter glossary, and a security/correctness "boundaries" section.
 
-![A generated walkthrough of the Flask tutorial: a sticky table-of-contents sidebar with a light/dark theme toggle, and a main column whose every claim is anchored to a file:line reference.](docs/walkthrough-hero.png)
+<table>
+  <tr>
+    <td width="50%"><img alt="A generated walkthrough of the Flask tutorial in light mode: a sticky table-of-contents sidebar with a light/dark theme toggle, and a main column whose every claim is anchored to a file:line reference." src="docs/walkthrough-hero.png"></td>
+    <td width="50%"><img alt="The same generated walkthrough in dark mode, with the Dark theme toggle active." src="docs/walkthrough-hero-dark.png"></td>
+  </tr>
+</table>
 
-<sub>Sample output for the Flask `flaskr` tutorial — see [`examples/Flaskr-Walkthrough.html`](examples/Flaskr-Walkthrough.html) for the full interactive file.</sub>
+<sub>Sample output for the Flask `flaskr` tutorial, in light and dark themes — see [`examples/Flaskr-Walkthrough.html`](examples/Flaskr-Walkthrough.html) for the full interactive file.</sub>
 
 > **Status: experimental.** Validated end-to-end on two very different stacks (see [Validation](#validation)). Treat it as promising, not battle-hardened.
 
