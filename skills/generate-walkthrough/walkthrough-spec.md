@@ -2,6 +2,18 @@
 
 The exact structure and design system for the phase-2 file. One self-contained `.html`, no external requests (inline all CSS/JS; no CDN, remote fonts, scripts, or images).
 
+## Document head (required)
+
+Start the file with these, in order, before `<title>`:
+
+```html
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+```
+
+`<meta charset="utf-8">` is mandatory — without it, em-dashes/bullets/arrows render as mojibake when the file is served over HTTP (as opposed to opened via `file://`). The viewport meta is mandatory so the responsive layout holds on mobile. Both must appear within the first 1024 bytes.
+
 ## Layout
 
 Two columns: a sticky left sidebar TOC (~288px) + a centered main column (`max-width: 820px`). The TOC is grouped with uppercase group labels and numbered mono links. **Derive group names from this system's actual arc** — foundations/overview, one or more for the primary journey, secondary flows, reference, parameter glossary, boundaries. The active section highlights on scroll (inlined IntersectionObserver).
