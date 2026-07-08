@@ -73,6 +73,7 @@ It will extract packaged source if needed, fan out investigators, write `<Projec
 | `.claude-plugin/plugin.json` | Plugin manifest (makes the repo `/plugin install`-able) |
 | `.claude-plugin/marketplace.json` | Marketplace catalog listing this one plugin |
 | `examples/Flaskr-Walkthrough.html` | A real sample output (see below) |
+| `CHANGELOG.md` | Release history |
 
 ## Validation
 
