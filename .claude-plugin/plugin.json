@@ -1,0 +1,20 @@
+{
+  "name": "generate-walkthrough",
+  "displayName": "Generate Walkthrough",
+  "description": "Turns any codebase into a single self-contained HTML walkthrough — a forensic, source-verified, screen-by-screen trace from first entry point to terminal outcome, grounded in real file:line evidence.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Arul"
+  },
+  "homepage": "https://github.com/ArulVelusamy/generate-walkthrough",
+  "repository": "https://github.com/ArulVelusamy/generate-walkthrough",
+  "license": "MIT",
+  "keywords": [
+    "walkthrough",
+    "documentation",
+    "codebase",
+    "onboarding",
+    "architecture",
+    "code-review"
+  ]
+}

@@ -22,18 +22,34 @@ It runs in three phases:
 
 ## Install
 
-Copy the skill into your Claude Code skills directory:
+### Option A — as a Claude Code plugin (recommended)
+
+Install once; it's then available in every project.
+
+```
+/plugin marketplace add ArulVelusamy/generate-walkthrough
+/plugin install generate-walkthrough@generate-walkthrough-marketplace
+```
+
+Update later with `/plugin update generate-walkthrough`.
+
+### Option B — copy the skill manually
 
 ```bash
 mkdir -p ~/.claude/skills/generate-walkthrough
-cp SKILL.md walkthrough-spec.md ~/.claude/skills/generate-walkthrough/
+cp skills/generate-walkthrough/SKILL.md skills/generate-walkthrough/walkthrough-spec.md \
+   ~/.claude/skills/generate-walkthrough/
 ```
+
+### Use it
 
 Then, in any repo:
 
 ```
 /generate-walkthrough
 ```
+
+> Installed as a plugin, the skill is namespaced: `/generate-walkthrough:generate-walkthrough`. Copied manually, it's just `/generate-walkthrough`.
 
 Optionally scope it: `/generate-walkthrough focus on the checkout flow`.
 
@@ -43,8 +59,10 @@ It will extract packaged source if needed, fan out investigators, write `<Projec
 
 | File | Purpose |
 |------|---------|
-| `SKILL.md` | The skill: three-phase workflow + orchestration model + verify loop |
-| `walkthrough-spec.md` | The exact HTML output spec — layout, design tokens, components, document arc (loaded during the write phase) |
+| `skills/generate-walkthrough/SKILL.md` | The skill: three-phase workflow + orchestration model + verify loop |
+| `skills/generate-walkthrough/walkthrough-spec.md` | The exact HTML output spec — layout, design tokens, components, document arc (loaded during the write phase) |
+| `.claude-plugin/plugin.json` | Plugin manifest (makes the repo `/plugin install`-able) |
+| `.claude-plugin/marketplace.json` | Marketplace catalog listing this one plugin |
 | `examples/Flaskr-Walkthrough.html` | A real sample output (see below) |
 
 ## Validation

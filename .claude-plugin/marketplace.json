@@ -1,0 +1,24 @@
+{
+  "name": "generate-walkthrough-marketplace",
+  "metadata": {
+    "description": "A single-plugin marketplace for generate-walkthrough — forensic, source-verified HTML codebase walkthroughs."
+  },
+  "owner": {
+    "name": "Arul"
+  },
+  "plugins": [
+    {
+      "name": "generate-walkthrough",
+      "source": "./",
+      "description": "Turns any codebase into a single self-contained HTML walkthrough — a forensic, source-verified, screen-by-screen trace grounded in real file:line evidence.",
+      "homepage": "https://github.com/ArulVelusamy/generate-walkthrough",
+      "license": "MIT",
+      "keywords": [
+        "walkthrough",
+        "documentation",
+        "codebase",
+        "onboarding"
+      ]
+    }
+  ]
+}
