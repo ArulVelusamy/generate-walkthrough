@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _Nothing yet._
 
+## [1.1.0] — 2026-07-08
+
+### Added
+- **Per-role model assignment** for the skill's subagents
+  (`skills/generate-walkthrough/SKILL.md`). The lead/orchestrator runs on
+  Opus 4.8; phase-1 investigators and phase-3 forward verifiers on Sonnet;
+  the phase-3 boundaries/security adversarial pass stays on Opus 4.8 as the
+  accuracy gate (never Haiku); the mechanical reverse coverage diff may use
+  Haiku. Investigators and verifiers must be dispatched as fresh read-only
+  agents (not forks) so the model override actually applies.
+
 ## [1.0.0] — 2026-07-08
 
 First public release: the `generate-walkthrough` skill, packaged as an

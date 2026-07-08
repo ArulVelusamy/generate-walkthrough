@@ -28,10 +28,24 @@ You are the **lead**. You own the single output file and its design system. Para
 
 If the source is packaged (zip/tarball) or not a git repo, extract only what's needed first (selectively — don't unpack huge vendored trees).
 
+### Model assignment
+
+Dispatch each role on the model named below; do not let subagents silently inherit the session model. **Investigators and verifiers must be fresh read-only agents, not forks** — a fork ignores the `model` override and inherits the lead's model, defeating the split.
+
+| Role | Phase | Model |
+|------|-------|-------|
+| Lead / orchestrator (owns the file) | all | Opus 4.8 — run the skill in an Opus 4.8 session |
+| Investigators (map source → `file:line` findings) | 1 | Sonnet |
+| Verifiers — forward re-derivation + cross-consistency | 3 | Sonnet |
+| Verifiers — boundaries / security adversarial pass | 3 | Opus 4.8 |
+| Reverse coverage diff (mechanical route/key/table enumeration) | 3 | Haiku — optional, cost-only |
+
+The boundaries/security pass is the accuracy gate: keep it on the strongest model and never downshift it to Haiku. Sonnet is the floor for anything that extracts exact routes, keys, or formulas — Haiku only for the mechanical enumeration diff.
+
 ## Phase 1 — Investigate, then verify
 
 1. **Recon (solo):** identify entry points, primary actor(s), the terminal outcome (the thing that means "done" — discover it, don't assume), and the rough list of screens/routes/flows/tables/params. Use it to slice the work.
-2. **Fan out (parallel investigators):** one per journey segment, one for the data model/schemas+indexes, one for the parameter glossary, one for the boundaries sweep. Each returns, from real source with `file:line`: what fires on load and on the primary action; every backend/service call (method+route, handler, what it does — auth, DB reads/writes with exact table/key names, external calls, metrics — and what it returns); where state is persisted with exact key names; derived values/formulas reproduced exactly; and boundary issues with a concrete reproduction path + severity.
+2. **Fan out (parallel investigators, Sonnet — see Model assignment):** one per journey segment, one for the data model/schemas+indexes, one for the parameter glossary, one for the boundaries sweep. Each returns, from real source with `file:line`: what fires on load and on the primary action; every backend/service call (method+route, handler, what it does — auth, DB reads/writes with exact table/key names, external calls, metrics — and what it returns); where state is persisted with exact key names; derived values/formulas reproduced exactly; and boundary issues with a concrete reproduction path + severity.
 3. **Merge & verify (lead):** consolidate into a **coverage inventory** — every step, route, key, schema, param, and issue, each with its `file:line`. Resolve conflicts by re-opening source yourself. Discard anything not grounded. Label dead/never-run code as such. Do not proceed with any unverified claim or placeholder.
 
 **Voice:** forensic and concrete, not marketing. Real names, routes, keys, formulas. Flag bugs inline where the reader meets them. Adapt all terminology to THIS system's domain.
@@ -44,9 +58,9 @@ Write the whole file in one pass. **Follow `walkthrough-spec.md` in this skill d
 
 Run every pass below; fix failures; re-run until a full pass yields **zero WRONG, zero UNVERIFIABLE, an empty coverage gap, and clean whole-file audits.**
 
-- **Forward (parallel verifiers):** split the claim ledger; each verifier re-opens the cited `file:line` and re-derives the claim from scratch. Apply corrections; for UNVERIFIABLE, re-anchor to real code or **delete the claim** — nothing unverifiable ships.
+- **Forward (parallel verifiers, Sonnet):** split the claim ledger; each verifier re-opens the cited `file:line` and re-derives the claim from scratch. Apply corrections; for UNVERIFIABLE, re-anchor to real code or **delete the claim** — nothing unverifiable ships.
 - **Reverse (coverage diff):** enumerate from code the full set of routes/handlers, screens/steps, persisted keys, tables+indexes, and parameters; diff against what the doc covers. Anything in code but absent is a gap — add it, or state it as explicitly out of scope. Never drop silently.
-- **Boundaries (adversarial):** re-check each reported issue reproduces given real code paths; delete anything speculative.
+- **Boundaries (adversarial, Opus 4.8 — accuracy gate, never Haiku):** re-check each reported issue reproduces given real code paths; delete anything speculative.
 - **Cross-consistency:** any value stated in more than one place (key, timeout, formula, status) is identical everywhere.
 - **Whole-file audits:** zero external requests (grep: no `http://`, `https://`, `//cdn`, remote `src`/`href`/`@import`/`fetch`/`url(http`); renders in both themes + manual toggle; body never scrolls horizontally); every TOC link resolves to a real section id; colors from token variables (no stray hex), identifiers in mono, components used consistently.
 
