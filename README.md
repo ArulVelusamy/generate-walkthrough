@@ -64,4 +64,4 @@ Two stacks is enough to show it generalizes, not enough to call it proven. Contr
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Remember to set your name in the copyright line.
+MIT — see [LICENSE](LICENSE).
