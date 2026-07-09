@@ -181,7 +181,8 @@ def render_field(field, hoisted):
     elif t == "object":
         out["type"] = "object"
         props = field.get("properties") or []
-        out["properties"] = {p["name"]: render_field(p, hoisted) for p in props}
+        if props:                       # omit an empty properties map (keeps output minimal/valid)
+            out["properties"] = {p["name"]: render_field(p, hoisted) for p in props}
         required = sorted(p["name"] for p in props if p.get("required"))
         if required:
             out["required"] = required
@@ -255,6 +256,14 @@ def test_apikey_cookie():
 def test_apikey_header():
     obj, gap = render_scheme({"scheme_name": "apikey", "kind": "apiKey", "in": "header", "name": "x-api-key"})
     assert obj == {"type": "apiKey", "in": "header", "name": "x-api-key"}
+    assert gap is None
+
+
+def test_apikey_gap_preserved():
+    obj, gap = render_scheme({"scheme_name": "session", "kind": "apiKey", "in": "cookie",
+                              "name": "session", "gap": "cookie name assumed"})
+    assert obj["type"] == "apiKey"
+    assert gap == "cookie name assumed"   # disclosed gap flows to x-coverage-gaps
 
 
 def test_http_bearer_jwt():
@@ -315,12 +324,12 @@ def render_scheme(auth):
     kind = auth.get("kind")
     if kind == "apiKey":
         obj = {"type": "apiKey", "in": auth["in"], "name": auth.get("name", "")}
-        return obj, None
+        return obj, auth.get("gap")     # preserve any disclosed gap (e.g. assumed cookie name)
     if kind == "http":
         obj = {"type": "http", "scheme": auth.get("scheme", "bearer")}
         if auth.get("bearerFormat"):
             obj["bearerFormat"] = auth["bearerFormat"]
-        return obj, None
+        return obj, auth.get("gap")
     if kind == "oauth2":
         # 3.0.3 requires a flows object with a URL; the URL is not recoverable from source,
         # so a REPLACE_ME placeholder is used and recorded as a gap. Scopes survive on the
@@ -459,6 +468,15 @@ def test_empty_auth_has_no_security_key():
     s["endpoints"][0]["auth"] = []
     doc = render_openapi(s)
     assert "security" not in doc["paths"]["/things"]["post"]
+
+
+def test_grounded_false_request_body_records_gap():
+    s = minimal_sidecar()
+    s["endpoints"][0]["request"]["body"] = {"grounded": False, "schema": None, "gap": "form fields not modeled"}
+    doc = render_openapi(s)
+    op = doc["paths"]["/things"]["post"]
+    assert op["requestBody"]["content"]["application/json"]["schema"] == {"description": "form fields not modeled"}
+    assert any("form fields not modeled" in g for g in doc["x-coverage-gaps"])
 ```
 
 - [ ] **Step 2: Run to verify it fails**
@@ -514,7 +532,9 @@ def render_openapi(sidecar):
             op["parameters"] = params
 
         body = ep["request"].get("body") or {}
-        if body.get("grounded") and body.get("schema"):
+        grounded_body = body.get("grounded") and body.get("schema")
+        gap_body = (not body.get("grounded")) and body.get("gap")   # ungrounded body still surfaces its gap
+        if grounded_body or gap_body:
             mt = ep["request"].get("media_type") or "application/json"
             schema = _body_schema(body, ep["operationId"] + "Request", components_schemas, gaps)
             op["requestBody"] = {"content": {mt: {"schema": schema}}}
