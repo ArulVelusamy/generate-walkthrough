@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ArulVelusamy/generate-walkthrough/schema/walkthrough-model.schema.json",
+  "title": "Walkthrough sidecar knowledge model",
+  "type": "object",
+  "required": ["schema_version", "project", "endpoints"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "project": {
+      "type": "object",
+      "required": ["name", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "source_ref": { "type": "string" }
+      }
+    },
+    "endpoints": { "type": "array", "items": { "$ref": "#/$defs/endpoint" } }
+  },
+  "$defs": {
+    "anchor": {
+      "type": "object",
+      "required": ["file", "symbol"],
+      "additionalProperties": false,
+      "properties": {
+        "file": { "type": "string", "minLength": 1 },
+        "symbol": { "type": "string", "minLength": 1 },
+        "line": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "fieldSchema": {
+      "type": "object",
+      "required": ["name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "enum": ["string", "number", "integer", "boolean", "object", "array", "enum"] },
+        "format": { "type": "string" },
+        "required": { "type": "boolean" },
+        "nullable": { "type": "boolean" },
+        "readOnly": { "type": "boolean" },
+        "writeOnly": { "type": "boolean" },
+        "enum": { "type": "array" },
+        "items": { "$ref": "#/$defs/fieldSchema" },
+        "properties": { "type": "array", "items": { "$ref": "#/$defs/fieldSchema" } },
+        "additionalProperties": { "type": ["boolean", "object"] },
+        "oneOf": { "type": "array", "items": { "$ref": "#/$defs/fieldSchema" } },
+        "discriminator": { "type": "string" },
+        "constraints": { "type": "array", "items": { "type": "string" } },
+        "anchor": { "$ref": "#/$defs/anchor" }
+      },
+      "allOf": [
+        { "if": { "properties": { "type": { "const": "enum" } }, "required": ["type"] },
+          "then": { "required": ["enum"] } },
+        { "if": { "properties": { "type": { "const": "array" } }, "required": ["type"] },
+          "then": { "required": ["items"] } }
+      ]
+    },
+    "authScheme": {
+      "type": "object",
+      "required": ["scheme_name", "kind"],
+      "additionalProperties": false,
+      "properties": {
+        "scheme_name": { "type": "string" },
+        "kind": { "enum": ["apiKey", "http", "oauth2", "openIdConnect", "mutualTLS", "none", "custom"] },
+        "in": { "enum": ["header", "cookie", "query"] },
+        "name": { "type": "string" },
+        "scheme": { "enum": ["bearer", "basic"] },
+        "bearerFormat": { "type": "string" },
+        "scopes": { "type": "array", "items": { "type": "string" } },
+        "sources": { "type": "array", "items": { "$ref": "#/$defs/anchor" } },
+        "gap": { "type": ["string", "null"] }
+      },
+      "allOf": [
+        { "if": { "properties": { "kind": { "const": "apiKey" } }, "required": ["kind"] },
+          "then": { "required": ["in"] } }
+      ]
+    },
+    "bodyRef": {
+      "type": "object",
+      "required": ["grounded"],
+      "additionalProperties": false,
+      "properties": {
+        "grounded": { "type": "boolean" },
+        "schema": { "anyOf": [ { "$ref": "#/$defs/fieldSchema" }, { "type": "null" } ] },
+        "gap": { "type": ["string", "null"] }
+      }
+    },
+    "responseContent": {
+      "type": "object",
+      "required": ["media_type", "body"],
+      "additionalProperties": false,
+      "properties": {
+        "media_type": { "type": "string" },
+        "body": { "$ref": "#/$defs/bodyRef" }
+      }
+    },
+    "response": {
+      "type": "object",
+      "required": ["status", "description", "content", "anchor"],
+      "additionalProperties": false,
+      "properties": {
+        "status": { "type": "integer", "minimum": 100, "maximum": 599 },
+        "description": { "type": "string", "minLength": 1 },
+        "headers": { "type": "array", "items": { "$ref": "#/$defs/fieldSchema" } },
+        "content": { "type": "array", "items": { "$ref": "#/$defs/responseContent" } },
+        "anchor": { "$ref": "#/$defs/anchor" }
+      }
+    },
+    "endpoint": {
+      "type": "object",
+      "required": ["id", "operationId", "group", "in_journey", "method", "path", "source_path", "summary", "handler", "auth", "request", "responses"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "operationId": { "type": "string" },
+        "group": { "type": "string" },
+        "in_journey": { "type": "boolean" },
+        "method": { "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"] },
+        "path": { "type": "string" },
+        "source_path": { "type": "string" },
+        "summary": { "type": "string" },
+        "handler": { "$ref": "#/$defs/anchor" },
+        "auth": { "type": "array", "items": { "$ref": "#/$defs/authScheme" } },
+        "request": {
+          "type": "object",
+          "required": ["media_type", "path_params", "query_params", "headers", "body"],
+          "additionalProperties": false,
+          "properties": {
+            "media_type": { "type": ["string", "null"] },
+            "path_params": { "type": "array", "items": { "$ref": "#/$defs/fieldSchema" } },
+            "query_params": { "type": "array", "items": { "$ref": "#/$defs/fieldSchema" } },
+            "headers": { "type": "array", "items": { "$ref": "#/$defs/fieldSchema" } },
+            "body": { "$ref": "#/$defs/bodyRef" }
+          }
+        },
+        "responses": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/response" } },
+        "callers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["screen", "anchor"],
+            "additionalProperties": false,
+            "properties": { "screen": { "type": "string" }, "anchor": { "$ref": "#/$defs/anchor" } }
+          }
+        }
+      }
+    }
+  }
+}
