@@ -1,0 +1,145 @@
+{
+  "schema_version": "1.0",
+  "project": { "name": "Flaskr", "version": "0.0.0-from-walkthrough", "source_ref": "flask-tutorial" },
+  "endpoints": [
+    {
+      "id": "get_auth_login", "operationId": "getLogin", "group": "Auth", "in_journey": true,
+      "method": "GET", "path": "/auth/login", "source_path": "/auth/login", "summary": "Render the login form",
+      "handler": { "file": "flaskr/auth.py", "symbol": "login", "line": 84 }, "auth": [],
+      "request": { "media_type": null, "path_params": [], "query_params": [], "headers": [], "body": { "grounded": true, "schema": null, "gap": null } },
+      "responses": [ { "status": 200, "description": "Renders the login form", "content": [ { "media_type": "text/html", "body": { "grounded": false, "schema": null, "gap": "rendered template; shape not modeled" } } ], "anchor": { "file": "flaskr/auth.py", "symbol": "login", "line": 84 } } ]
+    },
+    {
+      "id": "get_auth_register", "operationId": "getRegister", "group": "Auth", "in_journey": true,
+      "method": "GET", "path": "/auth/register", "source_path": "/auth/register", "summary": "Render the registration form",
+      "handler": { "file": "flaskr/auth.py", "symbol": "register", "line": 46 }, "auth": [],
+      "request": { "media_type": null, "path_params": [], "query_params": [], "headers": [], "body": { "grounded": true, "schema": null, "gap": null } },
+      "responses": [ { "status": 200, "description": "Renders the registration form", "content": [ { "media_type": "text/html", "body": { "grounded": false, "schema": null, "gap": "rendered template; shape not modeled" } } ], "anchor": { "file": "flaskr/auth.py", "symbol": "register", "line": 46 } } ]
+    },
+    {
+      "id": "get_blog_create", "operationId": "getCreate", "group": "Blog", "in_journey": true,
+      "method": "GET", "path": "/create", "source_path": "/create", "summary": "Render the create-post form",
+      "handler": { "file": "flaskr/blog.py", "symbol": "create", "line": 60 },
+      "auth": [ { "scheme_name": "session", "kind": "apiKey", "in": "cookie", "name": "session", "gap": "cookie name is configurable via SESSION_COOKIE_NAME; default assumed", "sources": [ { "file": "flaskr/auth.py", "symbol": "login_required", "line": 19 } ] } ],
+      "request": { "media_type": null, "path_params": [], "query_params": [], "headers": [], "body": { "grounded": true, "schema": null, "gap": null } },
+      "responses": [ { "status": 200, "description": "Renders the create-post form", "content": [ { "media_type": "text/html", "body": { "grounded": false, "schema": null, "gap": "rendered template; shape not modeled" } } ], "anchor": { "file": "flaskr/blog.py", "symbol": "create", "line": 60 } } ]
+    },
+    {
+      "id": "get_blog_index", "operationId": "getIndex", "group": "Blog", "in_journey": true,
+      "method": "GET", "path": "/", "source_path": "/", "summary": "List all posts, newest first, joined with author username",
+      "handler": { "file": "flaskr/blog.py", "symbol": "index", "line": 16 }, "auth": [],
+      "request": { "media_type": null, "path_params": [], "query_params": [], "headers": [], "body": { "grounded": true, "schema": null, "gap": null } },
+      "responses": [ { "status": 200, "description": "Renders the post list, newest first, with each post's author", "content": [ { "media_type": "text/html", "body": { "grounded": false, "schema": null, "gap": "rendered template (blog/index.html); shape not modeled" } } ], "anchor": { "file": "flaskr/blog.py", "symbol": "index", "line": 20 } } ]
+    },
+    {
+      "id": "get_blog_update", "operationId": "getUpdate", "group": "Blog", "in_journey": true,
+      "method": "GET", "path": "/{id}/update", "source_path": "/<int:id>/update", "summary": "Render the update form for a post the current user owns",
+      "handler": { "file": "flaskr/blog.py", "symbol": "update", "line": 100 },
+      "auth": [ { "scheme_name": "session", "kind": "apiKey", "in": "cookie", "name": "session", "gap": "cookie name is configurable via SESSION_COOKIE_NAME; default assumed", "sources": [ { "file": "flaskr/auth.py", "symbol": "login_required", "line": 19 } ] } ],
+      "request": {
+        "media_type": null,
+        "path_params": [ { "name": "id", "type": "integer", "required": true, "anchor": { "file": "flaskr/blog.py", "symbol": "update" } } ],
+        "query_params": [], "headers": [],
+        "body": { "grounded": true, "schema": null, "gap": null }
+      },
+      "responses": [
+        { "status": 200, "description": "Renders the update form pre-populated with the existing post's title and body", "headers": [], "content": [ { "media_type": "text/html", "body": { "grounded": false, "schema": null, "gap": "rendered template; shape not modeled" } } ], "anchor": { "file": "flaskr/blog.py", "symbol": "update" } },
+        { "status": 404, "description": "get_post aborts 404 when the post id does not exist", "headers": [], "content": [], "anchor": { "file": "flaskr/blog.py", "symbol": "get_post" } },
+        { "status": 403, "description": "get_post aborts 403 when the post is not owned by the current user", "headers": [], "content": [], "anchor": { "file": "flaskr/blog.py", "symbol": "get_post" } }
+      ]
+    },
+    {
+      "id": "get_hello", "operationId": "getHello", "group": "Smoke", "in_journey": false,
+      "method": "GET", "path": "/hello", "source_path": "/hello", "summary": "Smoke-test route",
+      "handler": { "file": "flaskr/__init__.py", "symbol": "hello", "line": 26 }, "auth": [],
+      "request": { "media_type": null, "path_params": [], "query_params": [], "headers": [], "body": { "grounded": true, "schema": null, "gap": null } },
+      "responses": [ { "status": 200, "description": "Returns the literal string 'Hello, World!'", "content": [ { "media_type": "text/html", "body": { "grounded": true, "schema": { "name": "root", "type": "string" }, "gap": null } } ], "anchor": { "file": "flaskr/__init__.py", "symbol": "hello", "line": 27 } } ]
+    },
+    {
+      "id": "post_auth_login", "operationId": "loginUser", "group": "Auth", "in_journey": true,
+      "method": "POST", "path": "/auth/login", "source_path": "/auth/login", "summary": "Verify credentials and start a session",
+      "handler": { "file": "flaskr/auth.py", "symbol": "login", "line": 84 }, "auth": [],
+      "request": {
+        "media_type": "application/x-www-form-urlencoded",
+        "path_params": [], "query_params": [], "headers": [],
+        "body": { "grounded": true, "schema": { "name": "root", "type": "object", "properties": [ { "name": "username", "type": "string", "required": true, "anchor": { "file": "flaskr/auth.py", "symbol": "login", "line": 92 } }, { "name": "password", "type": "string", "required": true, "anchor": { "file": "flaskr/auth.py", "symbol": "login", "line": 96 } } ] }, "gap": null }
+      },
+      "responses": [
+        { "status": 302, "description": "On success, session is cleared and re-set with user_id, then redirect to index", "headers": [ { "name": "Location", "type": "string", "anchor": { "file": "flaskr/auth.py", "symbol": "login" } } ], "content": [], "anchor": { "file": "flaskr/auth.py", "symbol": "login", "line": 105 } },
+        { "status": 200, "description": "Re-renders the login form with a flash when the username is not found or the password is incorrect", "headers": [], "content": [ { "media_type": "text/html", "body": { "grounded": false, "schema": null, "gap": "rendered template; shape not modeled" } } ], "anchor": { "file": "flaskr/auth.py", "symbol": "login", "line": 96 } }
+      ]
+    },
+    {
+      "id": "post_auth_logout", "operationId": "logoutUser", "group": "Auth", "in_journey": true,
+      "method": "POST", "path": "/auth/logout", "source_path": "/auth/logout",
+      "summary": "Clear the session and redirect to index. NOTE: source registers this route as GET-only (no methods= argument on @bp.route) — the walkthrough itself flags 'Logout is a GET' as a boundary issue (CSRF-forceable). This fixture models the endpoint as POST per the fixture's route-set contract; the method here is not source-grounded.",
+      "handler": { "file": "flaskr/auth.py", "symbol": "logout", "line": 112 }, "auth": [],
+      "request": { "media_type": null, "path_params": [], "query_params": [], "headers": [], "body": { "grounded": true, "schema": null, "gap": null } },
+      "responses": [ { "status": 302, "description": "session.clear() drops user_id, then redirect to index", "headers": [ { "name": "Location", "type": "string", "anchor": { "file": "flaskr/auth.py", "symbol": "logout" } } ], "content": [], "anchor": { "file": "flaskr/auth.py", "symbol": "logout", "line": 112 } } ]
+    },
+    {
+      "id": "post_auth_register", "operationId": "registerUser", "group": "Auth", "in_journey": true,
+      "method": "POST", "path": "/auth/register", "source_path": "/auth/register", "summary": "Create a new user account",
+      "handler": { "file": "flaskr/auth.py", "symbol": "register", "line": 46 }, "auth": [],
+      "request": {
+        "media_type": "application/x-www-form-urlencoded",
+        "path_params": [], "query_params": [], "headers": [],
+        "body": { "grounded": true, "schema": { "name": "root", "type": "object", "properties": [ { "name": "username", "type": "string", "required": true, "anchor": { "file": "flaskr/auth.py", "symbol": "register", "line": 54 } }, { "name": "password", "type": "string", "required": true, "anchor": { "file": "flaskr/auth.py", "symbol": "register", "line": 55 } } ] }, "gap": null }
+      },
+      "responses": [
+        { "status": 302, "description": "On success, redirect to auth.login", "headers": [ { "name": "Location", "type": "string", "anchor": { "file": "flaskr/auth.py", "symbol": "register" } } ], "content": [], "anchor": { "file": "flaskr/auth.py", "symbol": "register", "line": 77 } },
+        { "status": 200, "description": "Re-renders the registration form with a flash on validation error (missing username/password) or duplicate username (db.IntegrityError on the UNIQUE constraint)", "headers": [], "content": [ { "media_type": "text/html", "body": { "grounded": false, "schema": null, "gap": "rendered template; shape not modeled" } } ], "anchor": { "file": "flaskr/auth.py", "symbol": "register", "line": 59 } }
+      ]
+    },
+    {
+      "id": "post_blog_create", "operationId": "createPost", "group": "Blog", "in_journey": true,
+      "method": "POST", "path": "/create", "source_path": "/create", "summary": "Create a post owned by the current user",
+      "handler": { "file": "flaskr/blog.py", "symbol": "create", "line": 60 },
+      "auth": [ { "scheme_name": "session", "kind": "apiKey", "in": "cookie", "name": "session", "gap": "cookie name is configurable via SESSION_COOKIE_NAME; default assumed", "sources": [ { "file": "flaskr/auth.py", "symbol": "login_required", "line": 19 } ] } ],
+      "request": {
+        "media_type": "application/x-www-form-urlencoded",
+        "path_params": [], "query_params": [], "headers": [],
+        "body": { "grounded": true, "schema": { "name": "root", "type": "object", "properties": [ { "name": "title", "type": "string", "required": true, "anchor": { "file": "flaskr/blog.py", "symbol": "create", "line": 65 } }, { "name": "body", "type": "string", "required": false, "anchor": { "file": "flaskr/blog.py", "symbol": "create", "line": 66 } } ] }, "gap": null }
+      },
+      "responses": [
+        { "status": 302, "description": "On success, insert the post owned by g.user and redirect to blog.index", "headers": [ { "name": "Location", "type": "string", "anchor": { "file": "flaskr/blog.py", "symbol": "create" } } ], "content": [], "anchor": { "file": "flaskr/blog.py", "symbol": "create", "line": 81 } },
+        { "status": 200, "description": "Re-renders the create form with a flash when title is missing", "headers": [], "content": [ { "media_type": "text/html", "body": { "grounded": false, "schema": null, "gap": "rendered template; shape not modeled" } } ], "anchor": { "file": "flaskr/blog.py", "symbol": "create", "line": 69 } }
+      ]
+    },
+    {
+      "id": "post_blog_delete", "operationId": "deletePost", "group": "Blog", "in_journey": true,
+      "method": "POST", "path": "/{id}/delete", "source_path": "/<int:id>/delete", "summary": "Delete a post the current user owns",
+      "handler": { "file": "flaskr/blog.py", "symbol": "delete", "line": 121 },
+      "auth": [ { "scheme_name": "session", "kind": "apiKey", "in": "cookie", "name": "session", "gap": "cookie name is configurable via SESSION_COOKIE_NAME; default assumed", "sources": [ { "file": "flaskr/auth.py", "symbol": "login_required", "line": 19 } ] } ],
+      "request": {
+        "media_type": null,
+        "path_params": [ { "name": "id", "type": "integer", "required": true, "anchor": { "file": "flaskr/blog.py", "symbol": "delete" } } ],
+        "query_params": [], "headers": [],
+        "body": { "grounded": true, "schema": null, "gap": null }
+      },
+      "responses": [
+        { "status": 302, "description": "On success, delete the post and redirect to blog.index", "headers": [ { "name": "Location", "type": "string", "anchor": { "file": "flaskr/blog.py", "symbol": "delete" } } ], "content": [], "anchor": { "file": "flaskr/blog.py", "symbol": "delete", "line": 123 } },
+        { "status": 404, "description": "get_post aborts 404 when the post id does not exist", "headers": [], "content": [], "anchor": { "file": "flaskr/blog.py", "symbol": "get_post" } },
+        { "status": 403, "description": "get_post aborts 403 when the post is not owned by the current user", "headers": [], "content": [], "anchor": { "file": "flaskr/blog.py", "symbol": "get_post" } }
+      ]
+    },
+    {
+      "id": "post_blog_update", "operationId": "updatePost", "group": "Blog", "in_journey": true,
+      "method": "POST", "path": "/{id}/update", "source_path": "/<int:id>/update", "summary": "Update a post the current user owns",
+      "handler": { "file": "flaskr/blog.py", "symbol": "update", "line": 100 },
+      "auth": [ { "scheme_name": "session", "kind": "apiKey", "in": "cookie", "name": "session", "gap": "cookie name is configurable via SESSION_COOKIE_NAME; default assumed", "sources": [ { "file": "flaskr/auth.py", "symbol": "login_required", "line": 19 } ] } ],
+      "request": {
+        "media_type": "application/x-www-form-urlencoded",
+        "path_params": [ { "name": "id", "type": "integer", "required": true, "anchor": { "file": "flaskr/blog.py", "symbol": "update" } } ],
+        "query_params": [], "headers": [],
+        "body": { "grounded": true, "schema": { "name": "root", "type": "object", "properties": [ { "name": "title", "type": "string", "required": true, "anchor": { "file": "flaskr/blog.py", "symbol": "update" } }, { "name": "body", "type": "string", "required": false, "anchor": { "file": "flaskr/blog.py", "symbol": "update" } } ] }, "gap": null }
+      },
+      "responses": [
+        { "status": 302, "description": "On success, redirect to blog.index", "headers": [ { "name": "Location", "type": "string", "anchor": { "file": "flaskr/blog.py", "symbol": "update" } } ], "content": [], "anchor": { "file": "flaskr/blog.py", "symbol": "update", "line": 112 } },
+        { "status": 200, "description": "Re-renders the update form with a flash on validation error", "headers": [], "content": [ { "media_type": "text/html", "body": { "grounded": false, "schema": null, "gap": "rendered template; shape not modeled" } } ], "anchor": { "file": "flaskr/blog.py", "symbol": "update" } },
+        { "status": 404, "description": "get_post aborts 404 when the post id does not exist", "headers": [], "content": [], "anchor": { "file": "flaskr/blog.py", "symbol": "get_post" } },
+        { "status": 403, "description": "get_post aborts 403 when the post is not owned by the current user", "headers": [], "content": [], "anchor": { "file": "flaskr/blog.py", "symbol": "get_post" } }
+      ]
+    }
+  ]
+}
