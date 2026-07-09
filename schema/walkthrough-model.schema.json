@@ -17,7 +17,14 @@
         "source_ref": { "type": "string" }
       }
     },
-    "endpoints": { "type": "array", "items": { "$ref": "#/$defs/endpoint" } }
+    "endpoints": { "type": "array", "items": { "$ref": "#/$defs/endpoint" } },
+    "architecture": { "type": "array", "items": { "$ref": "#/$defs/narrativeBlock" } },
+    "sequence": { "type": "array", "items": { "$ref": "#/$defs/sequenceStep" } },
+    "state": { "type": "array", "items": { "$ref": "#/$defs/stateEntry" } },
+    "aws_calls": { "type": "array", "items": { "$ref": "#/$defs/awsCall" } },
+    "data_model": { "type": "array", "items": { "$ref": "#/$defs/model" } },
+    "parameters": { "type": "array", "items": { "$ref": "#/$defs/parameter" } },
+    "boundaries": { "type": "array", "items": { "$ref": "#/$defs/boundary" } }
   },
   "$defs": {
     "anchor": {
@@ -147,6 +154,34 @@
           }
         }
       }
+    },
+    "narrativeBlock": {
+      "type": "object", "required": ["title", "text", "sources"], "additionalProperties": false,
+      "properties": { "title": { "type": "string" }, "text": { "type": "string" }, "sources": { "type": "array", "items": { "$ref": "#/$defs/anchor" } } }
+    },
+    "sequenceStep": {
+      "type": "object", "required": ["step", "text", "anchor"], "additionalProperties": false,
+      "properties": { "step": { "type": "integer", "minimum": 1 }, "text": { "type": "string" }, "anchor": { "$ref": "#/$defs/anchor" } }
+    },
+    "stateEntry": {
+      "type": "object", "required": ["name", "scope", "lifecycle", "anchor"], "additionalProperties": false,
+      "properties": { "name": { "type": "string" }, "scope": { "type": "string" }, "lifecycle": { "type": "string" }, "anchor": { "$ref": "#/$defs/anchor" } }
+    },
+    "awsCall": {
+      "type": "object", "required": ["service", "operation", "purpose", "anchor"], "additionalProperties": false,
+      "properties": { "service": { "type": "string" }, "operation": { "type": "string" }, "resource": { "type": "object" }, "purpose": { "type": "string" }, "anchor": { "$ref": "#/$defs/anchor" } }
+    },
+    "model": {
+      "type": "object", "required": ["name", "fields", "anchor"], "additionalProperties": false,
+      "properties": { "name": { "type": "string" }, "fields": { "type": "array", "items": { "$ref": "#/$defs/fieldSchema" } }, "indexes": { "type": "array", "items": { "type": "string" } }, "anchor": { "$ref": "#/$defs/anchor" } }
+    },
+    "parameter": {
+      "type": "object", "required": ["name", "kind", "where_set", "who_reads"], "additionalProperties": false,
+      "properties": { "name": { "type": "string" }, "kind": { "type": "string" }, "where_set": { "$ref": "#/$defs/anchor" }, "who_reads": { "type": "array", "items": { "$ref": "#/$defs/anchor" } } }
+    },
+    "boundary": {
+      "type": "object", "required": ["severity", "title", "scenario", "sources"], "additionalProperties": false,
+      "properties": { "severity": { "enum": ["info", "warn", "crit"] }, "title": { "type": "string" }, "scenario": { "type": "string" }, "sources": { "type": "array", "items": { "$ref": "#/$defs/anchor" } } }
     }
   }
 }
