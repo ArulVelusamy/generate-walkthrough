@@ -50,13 +50,24 @@ The boundaries/security pass is the accuracy gate: keep it on the strongest mode
 
 **Voice:** forensic and concrete, not marketing. Real names, routes, keys, formulas. Flag bugs inline where the reader meets them. Adapt all terminology to THIS system's domain.
 
-## Phase 2 — Write one self-contained HTML file (solo — do not parallelize)
+## Phase 2 — Serialize the sidecar, then render HTML from it (solo)
 
-Write the whole file in one pass. **Follow `walkthrough-spec.md` in this skill directory for the exact layout, design tokens, typography, components, and document arc.** While writing, keep a **claim ledger**: every fact tagged with the `file:line` it came from — this feeds phase 3.
+Work in two ordered steps, single-threaded:
+
+1. **Build the sidecar before rendering any HTML.** Serialize the verified coverage inventory into `<Project>-walkthrough.model.json`, conforming to `schema/walkthrough-model.schema.json`. This file — not the HTML — is the source of truth. Sort every array by a stable id/name. Mark anything unrecoverable as `grounded:false` + a `gap` string; never invent. Validate it against the schema before proceeding.
+2. **Render the HTML from the sidecar.** Following `walkthrough-spec.md` (including the sidecar field → HTML region mapping), write the single self-contained HTML file from the sidecar's contents — structured sections become tables/flows, narrative sections become prose/callouts. Every value in the HTML must trace to a sidecar entry.
+
+Keep a claim ledger as before; it and the sidecar carry the same facts, feeding phase 3.
 
 ## Phase 3 — Review loop (parallel verify; loop to zero)
 
-Run every pass below; fix failures; re-run until a full pass yields **zero WRONG, zero UNVERIFIABLE, an empty coverage gap, and clean whole-file audits.**
+Phase 3 verifies three relationships (the HTML is no longer trusted just because it was written):
+
+1. **Sidecar vs source** — the forward/reverse/boundaries passes below re-derive every sidecar claim from source.
+2. **HTML vs sidecar** — a render-consistency check: every value shown in the HTML (line, method, field, key, formula) matches the sidecar entry it came from. This is an explicit cross-check of the emitted prose against the sidecar, not merely re-reading source.
+3. **Narrative vs source** — prose claims in `architecture`/`sequence`/`state` and callouts are re-derived from source as before (they are not mechanically checkable against the sidecar alone).
+
+Run every pass below; fix failures; re-run until a full pass yields zero WRONG, zero UNVERIFIABLE, an empty coverage gap, clean whole-file audits, and a clean HTML-vs-sidecar diff.
 
 - **Forward (parallel verifiers, Sonnet):** split the claim ledger; each verifier re-opens the cited `file:line` and re-derives the claim from scratch. Apply corrections; for UNVERIFIABLE, re-anchor to real code or **delete the claim** — nothing unverifiable ships.
 - **Reverse (coverage diff):** enumerate from code the full set of routes/handlers, screens/steps, persisted keys, tables+indexes, and parameters; diff against what the doc covers. Anything in code but absent is a gap — add it, or state it as explicitly out of scope. Never drop silently.

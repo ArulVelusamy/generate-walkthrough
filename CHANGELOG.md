@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_Nothing yet._
+### Added
+- `generate-walkthrough` now emits a machine-readable sidecar (`<Project>-walkthrough.model.json`) as its primary artifact, pinned by `schema/walkthrough-model.schema.json`. The HTML is rendered from the sidecar.
+
+### Changed
+- Phase 2 is now sidecar-first; phase 3 performs three-way verification (sidecar↔source, HTML↔sidecar, narrative↔source).
 
 ## [1.1.0] — 2026-07-08
 

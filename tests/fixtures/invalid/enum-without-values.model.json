@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "project": { "name": "Demo", "version": "0.0.0" },
+  "endpoints": [
+    { "id": "post_x", "operationId": "postX", "group": "X", "in_journey": true, "method": "POST", "path": "/x", "source_path": "/x", "summary": "X",
+      "handler": { "file": "app.py", "symbol": "x" }, "auth": [],
+      "request": { "media_type": "application/json", "path_params": [], "query_params": [], "headers": [],
+        "body": { "grounded": true, "schema": { "name": "root", "type": "object", "properties": [ { "name": "status", "type": "enum" } ] }, "gap": null } },
+      "responses": [ { "status": 200, "description": "OK", "content": [], "anchor": { "file": "app.py", "symbol": "x" } } ] }
+  ]
+}

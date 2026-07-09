@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "project": { "name": "Demo", "version": "0.0.0-from-walkthrough", "source_ref": "abc123" },
+  "architecture": [ { "title": "App factory", "text": "create_app builds the app.", "sources": [ { "file": "app.py", "symbol": "create_app" } ] } ],
+  "sequence": [ { "step": 1, "text": "Every request runs load_user.", "anchor": { "file": "app.py", "symbol": "load_user" } } ],
+  "state": [ { "name": "session['uid']", "scope": "session", "lifecycle": "set on login; cleared on logout", "anchor": { "file": "auth.py", "symbol": "login" } } ],
+  "endpoints": [
+    { "id": "get_root", "operationId": "getRoot", "group": "Root", "in_journey": true, "method": "GET", "path": "/", "source_path": "/", "summary": "Index",
+      "handler": { "file": "app.py", "symbol": "index", "line": 10 }, "auth": [],
+      "request": { "media_type": null, "path_params": [], "query_params": [], "headers": [], "body": { "grounded": true, "schema": null, "gap": null } },
+      "responses": [ { "status": 200, "description": "OK", "content": [ { "media_type": "text/html", "body": { "grounded": false, "schema": null, "gap": "template" } } ], "anchor": { "file": "app.py", "symbol": "index" } } ] }
+  ],
+  "aws_calls": [ { "service": "DynamoDB", "operation": "PutItem", "resource": { "table": "Ledger", "keys": ["pk", "sk"] }, "purpose": "persist", "anchor": { "file": "db.py", "symbol": "put" } } ],
+  "data_model": [ { "name": "Post", "fields": [ { "name": "id", "type": "integer", "required": true, "nullable": false, "constraints": ["PRIMARY KEY"] } ], "indexes": [], "anchor": { "file": "schema.sql", "symbol": "post" } } ],
+  "parameters": [ { "name": "SECRET_KEY", "kind": "config", "where_set": { "file": "app.py", "symbol": "create_app" }, "who_reads": [ { "file": "auth.py", "symbol": "login" } ] } ],
+  "boundaries": [ { "severity": "crit", "title": "CSRF", "scenario": "no token on POST", "sources": [ { "file": "blog.py", "symbol": "create" } ] } ]
+}

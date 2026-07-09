@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "project": { "name": "Demo", "version": "0.0.0-from-walkthrough" },
+  "endpoints": [
+    {
+      "id": "get_root",
+      "operationId": "getRoot",
+      "group": "Root",
+      "in_journey": true,
+      "method": "GET",
+      "path": "/",
+      "source_path": "/",
+      "summary": "Index",
+      "handler": { "file": "app.py", "symbol": "index", "line": 10 },
+      "auth": [],
+      "request": { "media_type": null, "path_params": [], "query_params": [], "headers": [], "body": { "grounded": true, "schema": null, "gap": null } },
+      "responses": [
+        { "status": 200, "description": "OK", "content": [ { "media_type": "text/html", "body": { "grounded": false, "schema": null, "gap": null } } ], "anchor": { "file": "app.py", "symbol": "index", "line": 12 } }
+      ]
+    }
+  ]
+}

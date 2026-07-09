@@ -59,3 +59,31 @@ Support light AND dark. Provide three blocks: `:root` (light default), `@media (
 4. **Reference** — persisted-state keys, data model / schemas + indexes.
 5. **Parameter glossary** — every parameter: what it is, where set, who reads it.
 6. **Boundaries** — correctness/security/consistency issues, grouped by severity, each citing the file and the concrete failure scenario.
+
+## Sidecar knowledge model
+
+Phase 2 emits `<Project>-walkthrough.model.json` **before** rendering the HTML, and the HTML is written from it. Its shape is pinned by `schema/walkthrough-model.schema.json` (JSON Schema Draft 2020-12) at the repo root; validate every sidecar against it.
+
+Top-level keys:
+
+- `endpoints` — every route (journey and non-journey), each with `method`, normalized `path` + `source_path`, `handler` anchor, `auth` (array of schemes), `request` (with explicit `media_type`), and `responses` (source-observed statuses only, each with a non-empty `description`, `headers`, and a `content` array (one entry per media type)). GET/POST on one route are two endpoints with distinct `operationId`s.
+- `aws_calls` — AWS SDK side-effects (service, operation, resource, purpose, anchor).
+- `data_model` — DB catalog (reference-only; NOT the API contract).
+- `parameters` — config/env glossary (reference-only).
+- `boundaries` — correctness/security findings (reference-only).
+- `architecture`, `sequence`, `state` — narrative-bearing sections that back the prose HTML regions.
+
+Anchors are symbol-primary (`file` + `symbol`, `line` optional). Unrecoverable data is `grounded:false` + a `gap` string — never invented.
+
+### Sidecar field → HTML region
+
+| Sidecar section | HTML region |
+|-----------------|-------------|
+| `architecture`, `sequence` | Foundations (architecture at a glance + sequence overview) |
+| `endpoints`, `state` | Primary journey (one section per screen; state lifecycle) |
+| `data_model` | Reference — data model / schemas |
+| `parameters` | Parameter glossary |
+| `boundaries` | Boundaries (grouped by severity) |
+| `aws_calls` | Reference — external/AWS calls |
+
+Every rendered HTML value (line, method, field, key) must trace to a sidecar entry; that identity is what phase 3 checks.
