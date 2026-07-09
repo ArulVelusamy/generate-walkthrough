@@ -10,8 +10,8 @@
       "responses": [ { "status": 200, "description": "Renders the login form", "content": [ { "media_type": "text/html", "body": { "grounded": false, "schema": null, "gap": "rendered template; shape not modeled" } } ], "anchor": { "file": "flaskr/auth.py", "symbol": "login", "line": 84 } } ]
     },
     {
-      "id": "get_auth_logout", "operationId": "logoutUser", "group": "Auth", "in_journey": true,
-      "method": "GET", "path": "/auth/logout", "source_path": "/logout",
+      "id": "get_auth_logout", "operationId": "getLogout", "group": "Auth", "in_journey": true,
+      "method": "GET", "path": "/auth/logout", "source_path": "/auth/logout",
       "summary": "Clear the session and redirect to index",
       "handler": { "file": "flaskr/auth.py", "symbol": "logout", "line": 112 }, "auth": [],
       "request": { "media_type": null, "path_params": [], "query_params": [], "headers": [], "body": { "grounded": true, "schema": null, "gap": null } },
