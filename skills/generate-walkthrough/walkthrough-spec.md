@@ -66,7 +66,7 @@ Phase 2 emits `<Project>-walkthrough.model.json` **before** rendering the HTML, 
 
 Top-level keys:
 
-- `endpoints` — every route (journey and non-journey), each with `method`, normalized `path` + `source_path`, `handler` anchor, `auth` (array of schemes), `request` (with explicit `media_type`), and `responses` (source-observed statuses only, each with a non-empty `description`, `headers`, and a `content` map). GET/POST on one route are two endpoints with distinct `operationId`s.
+- `endpoints` — every route (journey and non-journey), each with `method`, normalized `path` + `source_path`, `handler` anchor, `auth` (array of schemes), `request` (with explicit `media_type`), and `responses` (source-observed statuses only, each with a non-empty `description`, `headers`, and a `content` array (one entry per media type)). GET/POST on one route are two endpoints with distinct `operationId`s.
 - `aws_calls` — AWS SDK side-effects (service, operation, resource, purpose, anchor).
 - `data_model` — DB catalog (reference-only; NOT the API contract).
 - `parameters` — config/env glossary (reference-only).
