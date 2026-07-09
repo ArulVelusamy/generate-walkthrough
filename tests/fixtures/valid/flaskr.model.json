@@ -10,6 +10,14 @@
       "responses": [ { "status": 200, "description": "Renders the login form", "content": [ { "media_type": "text/html", "body": { "grounded": false, "schema": null, "gap": "rendered template; shape not modeled" } } ], "anchor": { "file": "flaskr/auth.py", "symbol": "login", "line": 84 } } ]
     },
     {
+      "id": "get_auth_logout", "operationId": "logoutUser", "group": "Auth", "in_journey": true,
+      "method": "GET", "path": "/auth/logout", "source_path": "/logout",
+      "summary": "Clear the session and redirect to index",
+      "handler": { "file": "flaskr/auth.py", "symbol": "logout", "line": 112 }, "auth": [],
+      "request": { "media_type": null, "path_params": [], "query_params": [], "headers": [], "body": { "grounded": true, "schema": null, "gap": null } },
+      "responses": [ { "status": 302, "description": "session.clear() drops user_id, then redirect to index", "headers": [ { "name": "Location", "type": "string", "anchor": { "file": "flaskr/auth.py", "symbol": "logout" } } ], "content": [], "anchor": { "file": "flaskr/auth.py", "symbol": "logout", "line": 112 } } ]
+    },
+    {
       "id": "get_auth_register", "operationId": "getRegister", "group": "Auth", "in_journey": true,
       "method": "GET", "path": "/auth/register", "source_path": "/auth/register", "summary": "Render the registration form",
       "handler": { "file": "flaskr/auth.py", "symbol": "register", "line": 46 }, "auth": [],
@@ -68,14 +76,6 @@
         { "status": 302, "description": "On success, session is cleared and re-set with user_id, then redirect to index", "headers": [ { "name": "Location", "type": "string", "anchor": { "file": "flaskr/auth.py", "symbol": "login" } } ], "content": [], "anchor": { "file": "flaskr/auth.py", "symbol": "login", "line": 105 } },
         { "status": 200, "description": "Re-renders the login form with a flash when the username is not found or the password is incorrect", "headers": [], "content": [ { "media_type": "text/html", "body": { "grounded": false, "schema": null, "gap": "rendered template; shape not modeled" } } ], "anchor": { "file": "flaskr/auth.py", "symbol": "login", "line": 96 } }
       ]
-    },
-    {
-      "id": "post_auth_logout", "operationId": "logoutUser", "group": "Auth", "in_journey": true,
-      "method": "POST", "path": "/auth/logout", "source_path": "/auth/logout",
-      "summary": "Clear the session and redirect to index. NOTE: source registers this route as GET-only (no methods= argument on @bp.route) — the walkthrough itself flags 'Logout is a GET' as a boundary issue (CSRF-forceable). This fixture models the endpoint as POST per the fixture's route-set contract; the method here is not source-grounded.",
-      "handler": { "file": "flaskr/auth.py", "symbol": "logout", "line": 112 }, "auth": [],
-      "request": { "media_type": null, "path_params": [], "query_params": [], "headers": [], "body": { "grounded": true, "schema": null, "gap": null } },
-      "responses": [ { "status": 302, "description": "session.clear() drops user_id, then redirect to index", "headers": [ { "name": "Location", "type": "string", "anchor": { "file": "flaskr/auth.py", "symbol": "logout" } } ], "content": [], "anchor": { "file": "flaskr/auth.py", "symbol": "logout", "line": 112 } } ]
     },
     {
       "id": "post_auth_register", "operationId": "registerUser", "group": "Auth", "in_journey": true,

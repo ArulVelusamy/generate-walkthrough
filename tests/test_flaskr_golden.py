@@ -19,7 +19,7 @@ def test_full_route_set_including_twins_and_smoke():
         ("GET", "/"),
         ("GET", "/auth/register"), ("POST", "/auth/register"),
         ("GET", "/auth/login"), ("POST", "/auth/login"),
-        ("POST", "/auth/logout"),
+        ("GET", "/auth/logout"),
         ("GET", "/create"), ("POST", "/create"),
         ("GET", "/{id}/update"), ("POST", "/{id}/update"),
         ("POST", "/{id}/delete"),
