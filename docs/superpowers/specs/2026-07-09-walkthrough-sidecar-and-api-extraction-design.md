@@ -326,7 +326,7 @@ The **sidecar schema (Part 1) is the shared contract** — pin it before either 
 **Golden target A — Flaskr** (in-repo; REST, form-encoded, session auth):
 
 - **Sidecar:** full route set incl. **GET/POST twins** and the non-journey route —
-  `GET /`, `GET|POST /auth/register`, `GET|POST /auth/login`, `POST /auth/logout`
+  `GET /`, `GET|POST /auth/register`, `GET|POST /auth/login`, `GET /auth/logout`
   (302), `GET|POST /create`, `GET|POST /{id}/update`, `POST /{id}/delete`,
   `GET /hello` (`in_journey:false`). POST bodies `x-www-form-urlencoded`; success →
   `302` (with `Location` header); validation error → `200` re-render;

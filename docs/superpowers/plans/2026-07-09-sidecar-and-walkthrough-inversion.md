@@ -519,7 +519,7 @@ def test_full_route_set_including_twins_and_smoke():
         ("GET", "/"),
         ("GET", "/auth/register"), ("POST", "/auth/register"),
         ("GET", "/auth/login"), ("POST", "/auth/login"),
-        ("POST", "/auth/logout"),
+        ("GET", "/auth/logout"),
         ("GET", "/create"), ("POST", "/create"),
         ("GET", "/{id}/update"), ("POST", "/{id}/update"),
         ("POST", "/{id}/delete"),
@@ -597,7 +597,7 @@ Create `tests/fixtures/valid/flaskr.model.json` by reading the facts out of `exa
 }
 ```
 
-Add the remaining ten endpoints in the same style (`GET /`, `GET|POST /auth/register`, `GET|POST /auth/login`, `POST /auth/logout`, `GET|POST /create`, `GET /{id}/update`, `POST /{id}/delete`), sorted by `id`. GET twins render a form → `200 text/html`; POST twins submit → `302` (success) and `200` (validation re-render). `POST /auth/logout` clears the session → `302`. Auth-gated endpoints carry the same `session` auth entry as `post_blog_update`; public ones (`GET /`, register, login) carry `auth: []`.
+Add the remaining ten endpoints in the same style (`GET /`, `GET|POST /auth/register`, `GET|POST /auth/login`, `GET /auth/logout`, `GET|POST /create`, `GET /{id}/update`, `POST /{id}/delete`), sorted by `id`. GET twins render a form → `200 text/html`; POST twins submit → `302` (success) and `200` (validation re-render). `GET /auth/logout` (Flask `@bp.route('/logout')` with no `methods=` — GET only) clears the session → `302`. Auth-gated endpoints carry the same `session` auth entry as `post_blog_update`; public ones (`GET /`, register, login) carry `auth: []`.
 
 - [ ] **Step 4: Run both test files to verify they pass**
 
