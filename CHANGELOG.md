@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _Nothing yet._
 
+## [1.2.1] — 2026-07-10
+
+### Fixed
+- `extract-api-spec`: oauth2 security schemes now declare the scopes their operations reference (flow `scopes` map populated and unioned across endpoints sharing a scheme), so strict linters/Swagger UI no longer flag an undeclared-scope reference.
+- `extract-api-spec`: Postman requests for oauth2 / OpenID Connect endpoints now carry a `{{accessToken}}` bearer hint instead of shipping with no auth.
+- `extract-api-spec`: the AWS-calls markdown companion escapes `|` (and newlines) in cell values so a resource/purpose containing a pipe can't break the table.
+
 ## [1.2.0] — 2026-07-09
 
 ### Added

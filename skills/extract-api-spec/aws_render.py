@@ -1,6 +1,11 @@
 """Render the AWS SDK-calls markdown companion from a sidecar. Stdlib only."""
 
 
+def _cell(value):
+    """Escape a value for a Markdown table cell (pipes and newlines would break the row)."""
+    return str(value).replace("|", "\\|").replace("\n", " ")
+
+
 def render_aws_calls(sidecar):
     calls = sidecar.get("aws_calls") or []
     lines = ["# AWS SDK calls", ""]
@@ -17,5 +22,5 @@ def render_aws_calls(sidecar):
         anc = c.get("anchor") or {}
         src = "%s:%s" % (anc.get("file", ""), anc.get("symbol", ""))
         lines.append("| %s | %s | %s | %s | %s |" % (
-            c["service"], c["operation"], res_str, c.get("purpose", ""), src))
+            _cell(c["service"]), _cell(c["operation"]), _cell(res_str), _cell(c.get("purpose", "")), _cell(src)))
     return "\n".join(lines) + "\n"

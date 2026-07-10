@@ -14,10 +14,12 @@ def render_scheme(auth):
         return obj, auth.get("gap")
     if kind == "oauth2":
         # 3.0.3 requires a flows object with a URL; the URL is not recoverable from source,
-        # so a REPLACE_ME placeholder is used and recorded as a gap. Scopes survive on the
-        # per-operation security requirement.
+        # so a REPLACE_ME placeholder is used and recorded as a gap. Declare the scopes this
+        # endpoint references so the flow's scope map matches the security requirement
+        # (Swagger UI / strict linters flag a requirement referencing an undeclared scope).
+        scopes = {s: "" for s in (auth.get("scopes") or [])}
         obj = {"type": "oauth2", "flows": {"clientCredentials": {
-            "tokenUrl": "https://REPLACE_ME/oauth2/token", "scopes": {}}}}
+            "tokenUrl": "https://REPLACE_ME/oauth2/token", "scopes": scopes}}}
         return obj, "oauth2 token URL for scheme not recoverable from source — placeholder used"
     if kind == "openIdConnect":
         obj = {"type": "openIdConnect",
@@ -32,6 +34,13 @@ def render_scheme(auth):
     return None, auth.get("gap") or "auth kind '%s' not expressible in OpenAPI" % kind
 
 
+def _merge_scheme(existing, new):
+    """Union oauth2 flow scopes across endpoints that share one scheme (keeps tokenUrl)."""
+    for flow_name, flow in (new.get("flows") or {}).items():
+        ex_flow = existing.setdefault("flows", {}).setdefault(flow_name, dict(flow))
+        ex_flow.setdefault("scopes", {}).update(flow.get("scopes") or {})
+
+
 def render_endpoint_security(auth_list, schemes, gaps):
     """Return the operation `security` list; register schemes; append gaps for unmappable auth."""
     security = []
@@ -42,6 +51,9 @@ def render_endpoint_security(auth_list, schemes, gaps):
         if obj is None:
             continue
         name = auth["scheme_name"]
-        schemes[name] = obj
+        if name in schemes:
+            _merge_scheme(schemes[name], obj)   # accumulate scopes seen for a shared scheme
+        else:
+            schemes[name] = obj
         security.append({name: list(auth.get("scopes") or [])})
     return security

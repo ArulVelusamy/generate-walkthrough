@@ -42,6 +42,11 @@ def _auth(auth_list, env_keys):
         if a.get("kind") == "http" and a.get("scheme") == "bearer":
             env_keys.add("token")
             return {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]}
+        if a.get("kind") in ("oauth2", "openIdConnect"):
+            # Postman's native oauth2 config isn't recoverable from source; ship a bearer hint
+            # so the request carries the access token rather than shipping with no auth.
+            env_keys.add("accessToken")
+            return {"type": "bearer", "bearer": [{"key": "token", "value": "{{accessToken}}", "type": "string"}]}
         if a.get("kind") == "apiKey" and a.get("in") == "header":
             env_keys.add("apiKey")
             return {"type": "apikey", "apikey": [

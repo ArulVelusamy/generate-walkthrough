@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_plugin_version_bumped():
     data = json.loads((ROOT / ".claude-plugin" / "plugin.json").read_text())
-    assert data["version"] == "1.2.0"
+    assert data["version"] == "1.2.1"
 
 
 def test_skill_md_present_and_shaped():
