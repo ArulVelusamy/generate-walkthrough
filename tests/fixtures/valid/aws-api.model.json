@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "project": {"name": "PaymentsAPI", "version": "0.0.0-from-walkthrough", "source_ref": "main"},
+  "endpoints": [
+    {
+      "id": "post_payments_create", "operationId": "createPayment", "group": "Payments", "in_journey": true,
+      "method": "POST", "path": "/payments", "source_path": "/payments", "summary": "Create a payment",
+      "handler": {"file": "handlers/payments.py", "symbol": "create"},
+      "auth": [{"scheme_name": "cognito", "kind": "oauth2", "scopes": ["payments.write"],
+                "sources": [{"file": "template.yaml", "symbol": "CognitoAuthorizer"}]}],
+      "request": {"media_type": "application/json", "path_params": [], "query_params": [], "headers": [],
+        "body": {"grounded": true, "schema": {"name": "root", "type": "object", "properties": [
+          {"name": "amount", "type": "number", "required": true, "anchor": {"file": "handlers/payments.py", "symbol": "create"}},
+          {"name": "currency", "type": "enum", "enum": ["USD", "EUR", "GBP"], "required": true, "anchor": {"file": "handlers/payments.py", "symbol": "create"}}
+        ]}, "gap": null}},
+      "responses": [
+        {"status": 201, "description": "Payment created", "headers": [], "content": [
+          {"media_type": "application/json", "body": {"grounded": true, "schema": {"name": "root", "type": "object", "properties": [
+            {"name": "id", "type": "string", "format": "uuid", "readOnly": true, "required": true, "anchor": {"file": "handlers/payments.py", "symbol": "create"}},
+            {"name": "createdAt", "type": "string", "format": "date-time", "readOnly": true, "required": true, "anchor": {"file": "handlers/payments.py", "symbol": "create"}}
+          ]}, "gap": null}}], "anchor": {"file": "handlers/payments.py", "symbol": "create"}}
+      ]
+    },
+    {
+      "id": "get_payments_list", "operationId": "listPayments", "group": "Payments", "in_journey": true,
+      "method": "GET", "path": "/payments", "source_path": "/payments", "summary": "List payments (paginated)",
+      "handler": {"file": "handlers/payments.py", "symbol": "list_payments"},
+      "auth": [{"scheme_name": "apikey", "kind": "apiKey", "in": "header", "name": "x-api-key",
+                "sources": [{"file": "template.yaml", "symbol": "ApiKey"}]}],
+      "request": {"media_type": null,
+        "path_params": [],
+        "query_params": [{"name": "nextToken", "type": "string", "required": false, "anchor": {"file": "handlers/payments.py", "symbol": "list_payments"}}],
+        "headers": [], "body": {"grounded": true, "schema": null, "gap": null}},
+      "responses": [
+        {"status": 200, "description": "A page of payments", "headers": [
+          {"name": "x-next-token", "type": "string", "anchor": {"file": "handlers/payments.py", "symbol": "list_payments"}}],
+         "content": [{"media_type": "application/json", "body": {"grounded": true, "schema": {"name": "root", "type": "object", "properties": [
+            {"name": "items", "type": "array", "required": true, "items": {"name": "item", "type": "object", "properties": [
+               {"name": "id", "type": "string", "format": "uuid", "required": true}]}, "anchor": {"file": "handlers/payments.py", "symbol": "list_payments"}},
+            {"name": "nextToken", "type": "string", "required": false, "anchor": {"file": "handlers/payments.py", "symbol": "list_payments"}}
+          ]}, "gap": null}}], "anchor": {"file": "handlers/payments.py", "symbol": "list_payments"}}
+      ]
+    },
+    {
+      "id": "get_payments_export", "operationId": "exportPayments", "group": "Payments", "in_journey": true,
+      "method": "GET", "path": "/payments/export", "source_path": "/payments/export", "summary": "Export (IAM-signed)",
+      "handler": {"file": "handlers/export.py", "symbol": "export"},
+      "auth": [{"scheme_name": "sigv4", "kind": "custom", "gap": "IAM SigV4 (AWS_IAM authorizer) — not expressible in OpenAPI 3.0.3",
+                "sources": [{"file": "template.yaml", "symbol": "AwsIamAuth"}]}],
+      "request": {"media_type": null, "path_params": [], "query_params": [], "headers": [],
+        "body": {"grounded": true, "schema": null, "gap": null}},
+      "responses": [
+        {"status": 200, "description": "Export stream", "headers": [], "content": [
+          {"media_type": "application/json", "body": {"grounded": false, "schema": null, "gap": "streamed export; shape not modeled"}}],
+         "anchor": {"file": "handlers/export.py", "symbol": "export"}}
+      ]
+    }
+  ],
+  "aws_calls": [
+    {"service": "DynamoDB", "operation": "PutItem", "resource": {"table": "Payments", "keys": ["pk", "sk"]},
+     "purpose": "persist a new payment", "anchor": {"file": "handlers/payments.py", "symbol": "create"}},
+    {"service": "S3", "operation": "GetObject", "resource": {"bucket": "payment-exports"},
+     "purpose": "read an export file", "anchor": {"file": "handlers/export.py", "symbol": "export"}}
+  ]
+}
