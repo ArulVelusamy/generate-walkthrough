@@ -7,6 +7,19 @@ sys.path.insert(0, str(ROOT / "skills" / "extract-api-spec"))
 from auth import render_scheme, render_endpoint_security
 
 
+def test_oauth2_flow_declares_its_scopes():
+    obj, _ = render_scheme({"scheme_name": "cognito", "kind": "oauth2", "scopes": ["a.read", "a.write"]})
+    assert obj["flows"]["clientCredentials"]["scopes"] == {"a.read": "", "a.write": ""}
+
+
+def test_shared_oauth2_scheme_unions_scopes_across_endpoints():
+    schemes, gaps = {}, []
+    render_endpoint_security([{"scheme_name": "cognito", "kind": "oauth2", "scopes": ["a.read"]}], schemes, gaps)
+    render_endpoint_security([{"scheme_name": "cognito", "kind": "oauth2", "scopes": ["a.write"]}], schemes, gaps)
+    assert set(schemes["cognito"]["flows"]["clientCredentials"]["scopes"]) == {"a.read", "a.write"}
+    assert schemes["cognito"]["flows"]["clientCredentials"]["tokenUrl"]   # preserved
+
+
 def test_apikey_cookie():
     obj, gap = render_scheme({"scheme_name": "session", "kind": "apiKey", "in": "cookie", "name": "session"})
     assert obj == {"type": "apiKey", "in": "cookie", "name": "session"}

@@ -30,6 +30,16 @@ def test_aws_calls_table():
     assert "DynamoDB" in md and "PutItem" in md and "Ledger" in md
 
 
+def test_aws_calls_escapes_pipe_in_cell():
+    # a value containing '|' must be escaped so it can't break the Markdown table row
+    md = render_aws_calls({"aws_calls": [
+        {"service": "S3", "operation": "GetObject", "resource": {"key": "a|b"},
+         "purpose": "read a|b", "anchor": {"file": "x.py", "symbol": "f"}}]})
+    assert "a\\|b" in md and "read a\\|b" in md         # inner pipes escaped
+    row = next(ln for ln in md.splitlines() if ln.startswith("| S3"))
+    assert row.replace("\\|", "").count("|") == 6      # once escaped pipes removed: 5 cells -> 6 delimiters
+
+
 def test_serialize_flaskr_writes_four_files(tmp_path):
     written = serialize(load(FLASKR), str(tmp_path))
     names = {Path(p).name for p in written}

@@ -62,3 +62,13 @@ def test_bearer_auth_uses_token_var_and_environment_has_baseurl():
     assert req["auth"]["type"] == "bearer"
     keys = {v["key"] for v in env["values"]}
     assert "baseUrl" in keys and "token" in keys
+
+
+def test_oauth2_endpoint_gets_bearer_hint_and_env_var():
+    s = sidecar()
+    s["endpoints"][0]["auth"] = [{"scheme_name": "cognito", "kind": "oauth2", "scopes": ["a.write"]}]
+    coll, env = render_postman(s)
+    req = coll["item"][0]["item"][0]["request"]
+    assert req["auth"]["type"] == "bearer"
+    assert req["auth"]["bearer"][0]["value"] == "{{accessToken}}"
+    assert "accessToken" in {v["key"] for v in env["values"]}
