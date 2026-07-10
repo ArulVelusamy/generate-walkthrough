@@ -80,3 +80,29 @@ def test_grounded_false_request_body_records_gap():
     op = doc["paths"]["/things"]["post"]
     assert op["requestBody"]["content"]["application/json"]["schema"] == {"description": "form fields not modeled"}
     assert any("form fields not modeled" in g for g in doc["x-coverage-gaps"])
+
+
+def test_oneof_param_registers_branch_components_no_dangling_ref():
+    # a param carrying oneOf must register its hoisted branch schemas (not emit a dangling $ref)
+    s = minimal_sidecar()
+    s["endpoints"][0]["request"]["query_params"] = [{
+        "name": "filter", "type": "object", "discriminator": "kind", "oneOf": [
+            {"name": "FilterA", "type": "object", "properties": [{"name": "kind", "type": "string", "required": True}]},
+            {"name": "FilterB", "type": "object", "properties": [{"name": "kind", "type": "string", "required": True}]},
+        ]}]
+    doc = render_openapi(s)
+    schemas = doc["components"]["schemas"]
+    param = doc["paths"]["/things"]["post"]["parameters"][0]
+    refs = [b["$ref"].split("/")[-1] for b in param["schema"]["oneOf"]]
+    assert refs == ["FilterA", "FilterB"]
+    assert all(name in schemas for name in refs)   # every $ref resolves — no dangling reference
+
+
+def test_coverage_gaps_are_deduplicated():
+    s = minimal_sidecar()
+    # two response bodies with the identical gap string -> one x-coverage-gaps entry
+    s["endpoints"][0]["responses"][0]["content"][0]["body"] = {"grounded": False, "schema": None, "gap": "same gap"}
+    s["endpoints"][0]["responses"][0]["content"].append(
+        {"media_type": "text/html", "body": {"grounded": False, "schema": None, "gap": "same gap"}})
+    doc = render_openapi(s)
+    assert doc["x-coverage-gaps"].count("same gap") == 1

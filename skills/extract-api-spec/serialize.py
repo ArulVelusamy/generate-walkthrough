@@ -24,6 +24,10 @@ def _assert_no_invention(sidecar, openapi):
     if sorted(op_ids) != sorted(ep_ids):
         raise ValueError("no-invention check failed: OpenAPI operations do not match sidecar endpoints "
                          "(%d vs %d)" % (len(op_ids), len(ep_ids)))
+    # operationIds must be unique — OpenAPI requires it, and component schemas are keyed on them,
+    # so a duplicate would silently overwrite one endpoint's body schema (multiset check above misses this).
+    if len(set(op_ids)) != len(op_ids):
+        raise ValueError("duplicate operationId(s) in sidecar: OpenAPI requires unique operationIds")
 
 
 def serialize(sidecar, outdir):

@@ -2,6 +2,8 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "skills" / "extract-api-spec"))
 
@@ -44,6 +46,15 @@ def test_flaskr_openapi_valid_and_no_invention(tmp_path):
     # no synthesized 401 anywhere
     statuses = [code for methods in doc["paths"].values() for op in methods.values() for code in op["responses"]]
     assert "401" not in statuses
+
+
+def test_duplicate_operation_id_is_rejected(tmp_path):
+    # two endpoints sharing an operationId would silently overwrite a component schema;
+    # the no-invention self-check must reject it rather than emit a cross-wired spec.
+    s = load(FLASKR)
+    s["endpoints"][1]["operationId"] = s["endpoints"][0]["operationId"]
+    with pytest.raises(ValueError):
+        serialize(s, str(tmp_path))
 
 
 def test_determinism_byte_identical(tmp_path):

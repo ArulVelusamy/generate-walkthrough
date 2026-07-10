@@ -3,13 +3,13 @@
 from fieldschema import render_field
 from auth import render_endpoint_security
 
-_METHODS = ("get", "post", "put", "patch", "delete", "head", "options")
 
-
-def _param(field, location):
+def _param(field, location, components):
+    # thread the shared components dict so an oneOf param registers its hoisted
+    # branch schemas instead of emitting a dangling $ref
     p = {"name": field["name"], "in": location,
          "required": bool(field.get("required")) or location == "path",
-         "schema": render_field(field, {})}
+         "schema": render_field(field, components)}
     return p
 
 
@@ -36,9 +36,9 @@ def render_openapi(sidecar):
     for ep in sidecar["endpoints"]:
         op = {"operationId": ep["operationId"], "tags": [ep["group"]], "summary": ep.get("summary", "")}
 
-        params = [_param(f, "path") for f in ep["request"].get("path_params", [])]
-        params += [_param(f, "query") for f in ep["request"].get("query_params", [])]
-        params += [_param(f, "header") for f in ep["request"].get("headers", [])]
+        params = [_param(f, "path", components_schemas) for f in ep["request"].get("path_params", [])]
+        params += [_param(f, "query", components_schemas) for f in ep["request"].get("query_params", [])]
+        params += [_param(f, "header", components_schemas) for f in ep["request"].get("headers", [])]
         if params:
             op["parameters"] = params
 
@@ -54,7 +54,7 @@ def render_openapi(sidecar):
         for resp in ep["responses"]:
             status = str(resp["status"])
             entry = {"description": resp["description"]}
-            headers = {h["name"]: {"schema": render_field(h, {})} for h in resp.get("headers", [])}
+            headers = {h["name"]: {"schema": render_field(h, components_schemas)} for h in resp.get("headers", [])}
             if headers:
                 entry["headers"] = headers
             content = {}
@@ -88,5 +88,6 @@ def render_openapi(sidecar):
     if components:
         doc["components"] = components
     if gaps:
-        doc["x-coverage-gaps"] = gaps
+        seen = set()
+        doc["x-coverage-gaps"] = [g for g in gaps if not (g in seen or seen.add(g))]  # de-dup, first-seen order
     return doc

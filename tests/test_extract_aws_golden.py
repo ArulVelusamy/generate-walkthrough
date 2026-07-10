@@ -27,7 +27,6 @@ def test_openapi_models_aws_native_features(tmp_path):
     serialize(load(AWS), str(tmp_path))
     doc = load(tmp_path / "PaymentsAPI-openapi.json")
     validate(doc)
-    schemas = doc["components"]["schemas"]
     # array + object element + enum + format present somewhere in components
     dumped = json.dumps(doc)
     assert '"type": "array"' in dumped
