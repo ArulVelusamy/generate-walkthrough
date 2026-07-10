@@ -4,6 +4,8 @@ A Claude Code skill that turns **any codebase** into a single, self-contained HT
 
 The output is one `.html` file that opens in any browser with **zero external assets** — no build, no dependencies, no network. Light + dark themes, a sticky navigable table of contents, a data-model reference, a parameter glossary, and a security/correctness "boundaries" section.
 
+Alongside the HTML, it emits a machine-readable **sidecar** (`<Project>-walkthrough.model.json`) — a verified knowledge model of the codebase's routes, params, schemas, and boundaries, pinned by a JSON Schema contract. A companion skill, **`extract-api-spec`**, turns that sidecar into a vanilla **OpenAPI 3.0.3** spec, a **Postman** collection, and an AWS-calls reference — ground-only, so anything not recoverable from source is flagged in `x-coverage-gaps`, never invented.
+
 <table>
   <tr>
     <td width="50%"><img alt="A generated walkthrough of the Flask tutorial in light mode: a sticky table-of-contents sidebar with a light/dark theme toggle, and a main column whose every claim is anchored to a file:line reference." src="docs/walkthrough-hero.png"></td>
@@ -48,6 +50,9 @@ Update later with `/plugin update generate-walkthrough`.
 mkdir -p ~/.claude/skills/generate-walkthrough
 cp skills/generate-walkthrough/SKILL.md skills/generate-walkthrough/walkthrough-spec.md \
    ~/.claude/skills/generate-walkthrough/
+
+# Optional: also install the API-spec extractor
+cp -r skills/extract-api-spec ~/.claude/skills/extract-api-spec
 ```
 
 ### Use it
