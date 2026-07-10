@@ -1,8 +1,8 @@
 {
   "name": "generate-walkthrough",
   "displayName": "Generate Walkthrough",
-  "description": "Turns any codebase into a single self-contained HTML walkthrough — a forensic, source-verified, screen-by-screen trace from first entry point to terminal outcome, grounded in real file:line evidence.",
-  "version": "1.1.0",
+  "description": "Turns any codebase into a single self-contained HTML walkthrough — a forensic, source-verified, screen-by-screen trace from first entry point to terminal outcome, grounded in real file:line evidence. Also derives OpenAPI 3.0.3 + Postman from the walkthrough sidecar.",
+  "version": "1.2.0",
   "author": {
     "name": "Arul"
   },
@@ -15,6 +15,9 @@
     "codebase",
     "onboarding",
     "architecture",
-    "code-review"
+    "code-review",
+    "openapi",
+    "postman",
+    "api"
   ]
 }

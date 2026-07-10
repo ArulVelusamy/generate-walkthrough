@@ -10,14 +10,16 @@
     {
       "name": "generate-walkthrough",
       "source": "./",
-      "description": "Turns any codebase into a single self-contained HTML walkthrough — a forensic, source-verified, screen-by-screen trace grounded in real file:line evidence.",
+      "description": "Turns any codebase into a single self-contained HTML walkthrough — a forensic, source-verified, screen-by-screen trace grounded in real file:line evidence. Also derives an OpenAPI 3.0.3 spec and a Postman collection from the walkthrough sidecar.",
       "homepage": "https://github.com/ArulVelusamy/generate-walkthrough",
       "license": "MIT",
       "keywords": [
         "walkthrough",
         "documentation",
         "codebase",
-        "onboarding"
+        "onboarding",
+        "openapi",
+        "postman"
       ]
     }
   ]

@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+_Nothing yet._
+
+## [1.2.0] — 2026-07-09
+
 ### Added
+- **`extract-api-spec` skill** — derives a vanilla OpenAPI 3.0.3 spec (`<Project>-openapi.json`), a Postman v2.1 collection + environment, and an AWS-calls markdown companion from a walkthrough sidecar, via a committed stdlib-only deterministic `serialize.py`. Ground-only: unrecoverable detail is marked in `x-coverage-gaps`, never invented; AWS SDK calls render to the companion, never into the OpenAPI.
 - `generate-walkthrough` now emits a machine-readable sidecar (`<Project>-walkthrough.model.json`) as its primary artifact, pinned by `schema/walkthrough-model.schema.json`. The HTML is rendered from the sidecar.
 
 ### Changed

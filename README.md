@@ -62,7 +62,17 @@ Then, in any repo:
 
 Optionally scope it: `/generate-walkthrough focus on the checkout flow`.
 
-It will extract packaged source if needed, fan out investigators, write `<ProjectName>-Walkthrough.html`, and run the verify loop.
+It will extract packaged source if needed, fan out investigators, write `<ProjectName>-Walkthrough.html`, and — alongside it — a machine-readable sidecar (`<ProjectName>-walkthrough.model.json`), then run the verify loop.
+
+### Also: extract an API spec
+
+The walkthrough emits a structured sidecar that the second skill turns into API artifacts:
+
+```
+/extract-api-spec
+```
+
+It runs a committed, deterministic `serialize.py` over the sidecar to produce a vanilla **OpenAPI 3.0.3** spec (`<Project>-openapi.json`), a **Postman v2.1** collection + environment, and an AWS-calls markdown companion — ground-only, with anything unrecoverable marked in `x-coverage-gaps` rather than invented.
 
 ## Files
 
@@ -70,6 +80,9 @@ It will extract packaged source if needed, fan out investigators, write `<Projec
 |------|---------|
 | `skills/generate-walkthrough/SKILL.md` | The skill: three-phase workflow + orchestration model + verify loop |
 | `skills/generate-walkthrough/walkthrough-spec.md` | The exact HTML output spec — layout, design tokens, components, document arc (loaded during the write phase) |
+| `schema/walkthrough-model.schema.json` | The sidecar knowledge-model contract (JSON Schema) both skills share |
+| `skills/extract-api-spec/SKILL.md` | Derives OpenAPI 3.0.3 + Postman from a walkthrough sidecar |
+| `skills/extract-api-spec/serialize.py` | The deterministic, stdlib-only sidecar → OpenAPI/Postman transform |
 | `.claude-plugin/plugin.json` | Plugin manifest (makes the repo `/plugin install`-able) |
 | `.claude-plugin/marketplace.json` | Marketplace catalog listing this one plugin |
 | `examples/Flaskr-Walkthrough.html` | A real sample output (see below) |
